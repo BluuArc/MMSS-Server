@@ -9,6 +9,11 @@ var serverRequestOptions = {
 	path: '/'
 };
 
+//homepage
+app.get('/',function(request,response){
+	response.sendFile(__dirname + "/" + "tester.html");
+});
+
 //initialize testClient for listening for browser requests
 var testClient = app.listen(3000,function() {
 	var host = testClient.address().address;
