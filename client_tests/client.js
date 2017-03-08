@@ -43,7 +43,7 @@ function get_server_response(path,method,callbackFn){
 	});
 	serverRequest.on('error',function(error){
 		console.log(error.stack);
-		fullResponse = JSON.stringify(error);//"Error code: " + error.code + "<br>Error number: " + error.errno;
+		fullResponse = JSON.stringify(error);
 		callbackFn(fullResponse);
 	});
 	serverRequest.on('end', function(){
@@ -53,14 +53,12 @@ function get_server_response(path,method,callbackFn){
 	serverRequest.end();
 }
 
-
-
 //homepage
 app.get('/',function(request,response){
 	response.sendFile(__dirname + "/" + "tester.html");
 });
 
-//let test client set location of server being tested
+//let test client set address and port of server being tested
 app.post('/setServerOptions', urlencodedParser,function(request,response){
 	if(request.body.ip_address != "")
 		serverRequestOptions.host = request.body.ip_address;
@@ -77,22 +75,38 @@ app.get('/serverInfo', function(request,response){
 });
 
 app.get('/listModules', function(request,response){
-	get_server_response('/listModules', 'GET', function(fullResponse){
-		response.send('This is a dummy response for /listModules.\
+	var path = '/listModules';
+	get_server_response(path, 'GET', function(fullResponse){
+		response.send('This is a dummy response for ' + path +'.\
 		The response is<br>' + fullResponse);
 	});
 });
 
 app.get('/listModules/:type', function(request,response){
-	response.send('This is a dummy response for /listModules/' + request.params.type);
+	var path = '/listModules/' + request.params.type;
+	get_server_response(path, 'GET', function(fullResponse){
+		response.send('This is a dummy response for ' + path + '.\
+		The response is<br>' + fullResponse);
+	});
+	// response.send('This is a dummy response for /listModules/' + request.params.type);
 });
 
 app.get('/listUsers', function(request,response){
-	response.send('This is a dummy response for /listUsers');
+	var path = '/listUsers';
+	get_server_response(path, 'GET', function(fullResponse){
+		response.send('This is a dummy response for ' + path +'.\
+		The response is<br>' + fullResponse);
+	});
+	// response.send('This is a dummy response for /listUsers');
 });
 
 app.get('/listUsers/:type', function(request,response){
-	response.send('This is a dummy response for /listUsers/' + request.params.type);
+	var path = '/listUsers/' + request.params.type;
+	get_server_response(path, 'GET', function(fullResponse){
+		response.send('This is a dummy response for ' + path + '.\
+		The response is<br>' + fullResponse);
+	});
+	// response.send('This is a dummy response for /listUsers/' + request.params.type);
 });
 
 
