@@ -78,7 +78,7 @@ app.get('/listModules', function(request,response){
 	var path = '/listModules';
 	get_server_response(path, 'GET', function(fullResponse){
 		response.send('This is a dummy response for ' + path +'.\
-		The response is<br>' + fullResponse);
+		<br>The response is<br>' + fullResponse);
 	});
 });
 
@@ -86,7 +86,7 @@ app.get('/listModules/:type', function(request,response){
 	var path = '/listModules/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
 		response.send('This is a dummy response for ' + path + '.\
-		The response is<br>' + fullResponse);
+		<br>The response is<br>' + fullResponse);
 	});
 	// response.send('This is a dummy response for /listModules/' + request.params.type);
 });
@@ -95,7 +95,7 @@ app.get('/listUsers', function(request,response){
 	var path = '/listUsers';
 	get_server_response(path, 'GET', function(fullResponse){
 		response.send('This is a dummy response for ' + path +'.\
-		The response is<br>' + fullResponse);
+		<br>The response is<br>' + fullResponse);
 	});
 	// response.send('This is a dummy response for /listUsers');
 });
@@ -104,7 +104,7 @@ app.get('/listUsers/:type', function(request,response){
 	var path = '/listUsers/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
 		response.send('This is a dummy response for ' + path + '.\
-		The response is<br>' + fullResponse);
+		<br>The response is<br>' + fullResponse);
 	});
 	// response.send('This is a dummy response for /listUsers/' + request.params.type);
 });
