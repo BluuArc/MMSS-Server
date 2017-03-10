@@ -26,7 +26,7 @@ app.get('/listModules/:type', function(request,response){
     response.end("this is the list modules api call for type " + request.params.type + " in the server");
 });
 
-var server = app.listen(8081, function(){
+var server = app.listen(80, function(){
     var host = server.address().address;
 	var port = server.address().port;
 
