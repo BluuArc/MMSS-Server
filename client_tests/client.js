@@ -1,36 +1,38 @@
 var http = require('http');
+var https = require('https');
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
 // Create application/x-www-form-urlencoded parser
-// Used in functions alreated to POST
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+// Used in functions related to POST
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+// var postData = querystring.stringify({
+//   'msg' : 'Hello World!'
+// });
+
+// var options = {
+//   hostname: 'www.google.com',
+//   port: 80,
+//   path: '/upload',
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/x-www-form-urlencoded',
+//     'Content-Length': Buffer.byteLength(postData)
+//   }
+// };
 
 //options to be used for all tests
 var serverRequestOptions = {
 	host: 'localhost',
 	port: '8081',
 	path: '/',
-	method: 'GET'
-};
-
-//callback function for http.request calls
-function get_http_response(response){
-	//continuously update stream with data
-	var body = '';
-	response.on('data', function(data) {
-		body += data;
-	});
-
-	// finished reading all data
-	response.on('end', function(){
-		return body;
-	});
-
-	response.on('error', function(error){
-		return JSON.stringify(error);
-	});
+	method: 'GET',
+	// headers: {
+    // 'Content-Type': 'application/x-www-form-urlencoded',
+    // 'Content-Length': Buffer.byteLength(postData)
+  	// }
 };
 
 //get a response form the server
@@ -39,13 +41,26 @@ function get_server_response(path,method,callbackFn){
 	serverRequestOptions.method = method;
 	var fullResponse = "";
 	var serverRequest = http.get(serverRequestOptions, function(serverResponse){
-			fullResponse = get_http_response(serverResponse);
+		serverResponse.on('data', function(data) {
+			fullResponse += data;
+		});
+
+		// finished reading all data
+		serverResponse.on('end', function(){
+			callbackFn(fullResponse);
+		});
+
+		serverResponse.on('error', function(error){
+			callbackFn(JSON.stringify(error));
+		});
 	});
+
 	serverRequest.on('error',function(error){
 		console.log(error.stack);
 		fullResponse = JSON.stringify(error);
 		callbackFn(fullResponse);
 	});
+
 	serverRequest.on('end', function(){
 		callbackFn(fullResponse);
 	});
@@ -70,43 +85,39 @@ app.post('/setServerOptions', urlencodedParser,function(request,response){
 });
 
 app.get('/serverInfo', function(request,response){
-	response.send('Every API call will attempt to communicate with ' + 
+	response.end('Every API call will attempt to communicate with ' + 
 		serverRequestOptions.host + ":" + serverRequestOptions.port);
 });
 
 app.get('/listModules', function(request,response){
 	var path = '/listModules';
 	get_server_response(path, 'GET', function(fullResponse){
-		response.send('This is a dummy response for ' + path +'.\
-		<br>The response is<br>' + fullResponse);
+		response.end('This is a dummy response for ' + path +'.\nThe response is\n---\n' + fullResponse);
 	});
 });
 
 app.get('/listModules/:type', function(request,response){
 	var path = '/listModules/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
-		response.send('This is a dummy response for ' + path + '.\
-		<br>The response is<br>' + fullResponse);
+		response.end('This is a dummy response for ' + path + '.\nThe response is\n---\n' + fullResponse);
 	});
-	// response.send('This is a dummy response for /listModules/' + request.params.type);
+	// response.end('This is a dummy response for /listModules/' + request.params.type);
 });
 
 app.get('/listUsers', function(request,response){
 	var path = '/listUsers';
 	get_server_response(path, 'GET', function(fullResponse){
-		response.send('This is a dummy response for ' + path +'.\
-		<br>The response is<br>' + fullResponse);
+		response.end('This is a dummy response for ' + path +'.\nThe response is\n---\n' + fullResponse);
 	});
-	// response.send('This is a dummy response for /listUsers');
+	// response.end('This is a dummy response for /listUsers');
 });
 
 app.get('/listUsers/:type', function(request,response){
 	var path = '/listUsers/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
-		response.send('This is a dummy response for ' + path + '.\
-		<br>The response is<br>' + fullResponse);
+		response.end('This is a dummy response for ' + path + '.\nThe response is\n---\n' + fullResponse);
 	});
-	// response.send('This is a dummy response for /listUsers/' + request.params.type);
+	// response.end('This is a dummy response for /listUsers/' + request.params.type);
 });
 
 
