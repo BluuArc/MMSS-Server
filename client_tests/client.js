@@ -8,39 +8,22 @@ var bodyParser = require('body-parser');
 // Used in functions related to POST
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-// var postData = querystring.stringify({
-//   'msg' : 'Hello World!'
-// });
-
-// var options = {
-//   hostname: 'www.google.com',
-//   port: 80,
-//   path: '/upload',
-//   method: 'POST',
-//   headers: {
-//     'Content-Type': 'application/x-www-form-urlencoded',
-//     'Content-Length': Buffer.byteLength(postData)
-//   }
-// };
-
 //options to be used for all tests
 var serverRequestOptions = {
 	host: 'localhost',
 	port: '8081',
 	path: '/',
-	method: 'GET',
-	// headers: {
-    // 'Content-Type': 'application/x-www-form-urlencoded',
-    // 'Content-Length': Buffer.byteLength(postData)
-  	// }
+	method: 'GET'
 };
 
-//get a response form the server
+//get a response from the server
 function get_server_response(path,method,callbackFn){
 	serverRequestOptions.path = path;
 	serverRequestOptions.method = method;
 	var fullResponse = "";
-	var serverRequest = http.get(serverRequestOptions, function(serverResponse){
+
+	//read data
+	var serverRequest = https.get(serverRequestOptions, function(serverResponse){
 		serverResponse.on('data', function(data) {
 			fullResponse += data;
 		});
@@ -101,7 +84,6 @@ app.get('/listModules/:type', function(request,response){
 	get_server_response(path, 'GET', function(fullResponse){
 		response.end('This is a dummy response for ' + path + '.\nThe response is\n---\n' + fullResponse);
 	});
-	// response.end('This is a dummy response for /listModules/' + request.params.type);
 });
 
 app.get('/listUsers', function(request,response){
@@ -109,7 +91,6 @@ app.get('/listUsers', function(request,response){
 	get_server_response(path, 'GET', function(fullResponse){
 		response.end('This is a dummy response for ' + path +'.\nThe response is\n---\n' + fullResponse);
 	});
-	// response.end('This is a dummy response for /listUsers');
 });
 
 app.get('/listUsers/:type', function(request,response){
@@ -117,7 +98,6 @@ app.get('/listUsers/:type', function(request,response){
 	get_server_response(path, 'GET', function(fullResponse){
 		response.end('This is a dummy response for ' + path + '.\nThe response is\n---\n' + fullResponse);
 	});
-	// response.end('This is a dummy response for /listUsers/' + request.params.type);
 });
 
 
