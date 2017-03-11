@@ -75,28 +75,28 @@ app.get('/serverInfo', function(request,response){
 app.get('/listModules', function(request,response){
 	var path = '/listModules';
 	get_server_response(path, 'GET', function(fullResponse){
-		response.end('This is a dummy response for ' + path +'.\nThe response is\n---\n' + fullResponse);
+		response.end(fullResponse);
 	});
 });
 
 app.get('/listModules/:type', function(request,response){
 	var path = '/listModules/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
-		response.end('This is a dummy response for ' + path + '.\nThe response is\n---\n' + fullResponse);
+		response.end(fullResponse);
 	});
 });
 
 app.get('/listUsers', function(request,response){
 	var path = '/listUsers';
 	get_server_response(path, 'GET', function(fullResponse){
-		response.end('This is a dummy response for ' + path +'.\nThe response is\n---\n' + fullResponse);
+		response.end(fullResponse);
 	});
 });
 
 app.get('/listUsers/:type', function(request,response){
 	var path = '/listUsers/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
-		response.end('This is a dummy response for ' + path + '.\nThe response is\n---\n' + fullResponse);
+		response.end(fullResponse);
 	});
 });
 
