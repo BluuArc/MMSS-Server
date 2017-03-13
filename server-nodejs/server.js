@@ -1,6 +1,15 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var argv = require('yargs')
+    .command('count', 'Count the lines in a file')
+    .usage('Usage: $0 -p [integer]')
+    .default("p", 80)
+    .alias('p', 'port')
+    .describe('p', 'Port to run server on')
+    .help('h')
+    .alias('h', 'help')
+    .argv;
 
 var users = [];
 var modules = [];
@@ -162,7 +171,7 @@ app.post('/editModule', urlencodedParser, function(request,response){
     // response.end();
 });
 
-var server = app.listen(80, function(){
+var server = app.listen(argv["port"], function(){
     var host = server.address().address;
 	var port = server.address().port;
 
