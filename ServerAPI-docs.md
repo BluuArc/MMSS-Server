@@ -9,9 +9,9 @@ This project is still in the very early stages of development as of March 10, 20
 1. Download the folder/repo onto your system.
 2. Navigate to folder that contains the `server.js` file in a terminal window.
 3. Start the server from the command line with `node server.js`
-   * By default, the server listens to `127.0.0.1:80`
+   * By default, the server listens to `127.0.0.1:80`. This can be changed by running the program with a `-p` or `--port` parameter. For example, running it with `node server.js --port 8080` will allow it to run on port 8080.
    * If you encounter an error, try again with `sudo node server.js`
-   * TODO: Add option to change default IP and port.
+   * TODO: Add option to change default IP.
 4. If you want to close the server, pressing CTRL-C on the terminal should do the trick.
    * Data may be lost as a result of this method, so be mindful of when you close.
    * TODO: Add a more graceful way of closing the server.
