@@ -15,7 +15,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Adding a Module
 * **Method Tested:** `/addModule`
-* **Input:** JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
+* **Input:** Accesssed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
 ``` 
 {
     "isBeingListened":true,
@@ -37,7 +37,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Removing a Module
 * **Method Tested:** `/removeModule`
-* **Input:** JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module.
+* **Input:** Accessed via the DELETE protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module.
 ``` 
 {
     "id":"abcde12345"
@@ -54,7 +54,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Editing a Module
 * **Method Tested:** `/editModule`
-* **Input:** JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and any changed data.
+* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and any changed data.
 ``` 
 {
     "id":"abcde12345",
@@ -108,7 +108,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Adding a User
 * **Method Tested:** `/addUser`
-* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
+* **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
 ``` 
 {
     "isBeingListened":false,
@@ -130,7 +130,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Removing a User
 * **Method Tested:** `/removeUser`
-* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+* **Input:** Accessed via the DELETE protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
 ``` 
 {
     "id":"abcde12345"
@@ -147,7 +147,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Editing a User
 * **Method Tested:** `/editUser`
-* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and any changed data.
+* **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and any changed data.
 ``` 
 {
     "id":"abcde12345",
@@ -202,7 +202,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Requesting Logs of a User
 * **Method Tested:** `/requestUserLogs`
-* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
 ``` 
 {
     "id":"abcde12345"
@@ -223,7 +223,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Requesting Notifications of a User
 * **Method Tested:** `/requestUserNotifications`
-* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
 ``` 
 {
     "id":"abcde12345"
