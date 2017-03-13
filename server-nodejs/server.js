@@ -8,6 +8,13 @@ var modules = [];
 var sampleUser = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"12345abcde","type":"sensormodule"}');
 var sampleModule = JSON.parse('{"isBeingListened":false,"name":"john doe","id":"12345abcde","type":"guardian","logs":["log 1"],"notifications":["note 1"]}');
 
+// sample setup
+function WoOz_setup(){
+    console.log("**NOTE:** STARTING WIZARD OF OZ DEMO");
+    users.push(sampleUser);
+    modules.push(sampleModule);
+}
+
 function findUser(fieldName, fieldData){
     for(u in users){
         var curUser = users[u];
@@ -81,7 +88,7 @@ app.get('/listUsers/:type', function(request,response){
 
 app.get('/listModules', function(request,response){
     console.log("Received request for listModules");
-    response.end("this is the list modules api call in the server");
+    response.end(JSON.stringify(modules));
 });
 
 app.get('/listModules/:type', function(request,response){
@@ -94,7 +101,7 @@ app.post('/addModule', urlencodedParser, function(request,response){
     var type = data.type.toLowerCase();
     var dummyResponse;
     if(type.equals("module")){
-        // addModule(data);
+        console.log("TODO: add addModule functionality");
         dummyResponse = {
             response: true,
             message: "Added " + data.id + " to the module list."
@@ -111,9 +118,55 @@ app.post('/addModule', urlencodedParser, function(request,response){
     // response.end();
 });
 
+app.delete('/removeModule', urlencodedParser, function(request,response){
+    var data = JSON.parse(request.body.data);
+    var type = data.type.toLowerCase();
+    var dummyResponse;
+    if(type.equals("module")){
+        console.log("TODO: add removeModule functionality");
+        dummyResponse = {
+            response: true,
+            message: "Removed " + data.id + " from the module list."
+        };
+    }else{
+        console.log("removeModule: Invalid data type received");
+        console.log(data);
+        dummyResponse = {
+            response: false,
+            message: "Input type is not a module"
+        };
+    }
+    response.end(dummyResponse);
+    // response.end();
+});
+
+app.post('/editModule', urlencodedParser, function(request,response){
+    var data = JSON.parse(request.body.data);
+    var type = data.type.toLowerCase();
+    var dummyResponse;
+    if(type.equals("module")){
+        console.log("TODO: add editModule functionality");
+        dummyResponse = {
+            response: true,
+            message: "Changed " + data.id + " values."
+        };
+    }else{
+        console.log("editModule: Invalid data type received");
+        console.log(data);
+        dummyResponse = {
+            response: false,
+            message: "Input type is not a module"
+        };
+    }
+    response.end(dummyResponse);
+    // response.end();
+});
+
 var server = app.listen(80, function(){
     var host = server.address().address;
 	var port = server.address().port;
+
+    WoOz_setup();
 
 	console.log("Server listening at http://%s:%s", host, port);  
 });
