@@ -86,23 +86,23 @@ app.get('/', function(request,response){
 });
 
 app.get('/listUsers', function(request,response){
-    console.log("Received request for listUsers");
-    response.end("this is the list users api call in the server");
+    response.end(JSON.stringify(users));
 });
 
 app.get('/listUsers/:type', function(request,response){
-    console.log("Received request for listUsers");
-    response.end("this is the list users api call for type " + request.params.type + " in the server");
+    console.log("TODO: add type search functionality for listUsers");
+    response.end(JSON.stringify(users));
+    // response.end("this is the list users api call for type " + request.params.type + " in the server");
 });
 
 app.get('/listModules', function(request,response){
-    console.log("Received request for listModules");
     response.end(JSON.stringify(modules));
 });
 
 app.get('/listModules/:type', function(request,response){
-    console.log("Received request for listModules");
-    response.end("this is the list modules api call for type " + request.params.type + " in the server");
+    console.log("TODO: add type search functionality for listModules");
+    response.end(JSON.stringify(modules));
+    // response.end("this is the list modules api call for type " + request.params.type + " in the server");
 });
 
 app.post('/addModule', urlencodedParser, function(request,response){
