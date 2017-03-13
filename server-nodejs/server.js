@@ -2,6 +2,65 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
+var users = [];
+var modules = [];
+
+var sampleUser = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"12345abcde","type":"sensormodule"}');
+var sampleModule = JSON.parse('{"isBeingListened":false,"name":"john doe","id":"12345abcde","type":"guardian","logs":["log 1"],"notifications":["note 1"]}');
+
+function findUser(fieldName, fieldData){
+    for(u in users){
+        var curUser = users[u];
+        if(curUser[fieldName] == fieldData){
+            return curUser;
+        }
+    }
+    return null;
+}
+
+function addUser(user_obj){
+    userBlacklist.add(user_obj);
+    notifyAll("Added " + user_obj["name"] + " to the blacklist.");
+}
+
+function removeUser(user_obj){
+    userBlacklist.add(user_obj);
+    notifyAll("Added " + user_obj["name"] + " to the blacklist.");
+}
+
+function editUserData(user, newData){
+    // var message = "";
+    // var changedFields = [];
+    // var fields = ["name", "type", "isBeingListened","logs","notifications"]; //fields that are possible to change
+    // for(f in fields){
+    //     var curField = fields[f];
+    //     if(newData[curField] != undefined){
+    //         user[curField] = newData[curField];
+    //         changedFields.push(curField);
+    //     }
+    // }
+
+    // //TODO:
+    // for(f in changedFields){
+    //     if(changedFields[f] == "name"){
+    //         message += "Changed " + user["id"] + "'s name to be '" + user["name"] + "'.";
+    //     }else if (changedFields[f] == "type")
+    // }
+    
+}
+
+function editUser(id, newData){
+    var user = findUser('id', id);
+    if(user == null){
+        var result = {
+            success: false,
+            message: "User not found"
+        };
+        return result;
+    }
+    editUserData(user, newData);
+}
+
 // Create application/x-www-form-urlencoded parser
 // Used in functions related to POST
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -32,17 +91,25 @@ app.get('/listModules/:type', function(request,response){
 
 app.post('/addModule', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var type = request.body.type.toLowerCase();
-    if(type.equals("user")){
-        addUser(data);
-    }else if(type.equals("module")){
-        addModule(data);
+    var type = data.type.toLowerCase();
+    var dummyResponse;
+    if(type.equals("module")){
+        // addModule(data);
+        dummyResponse = {
+            response: true,
+            message: "Added " + data.id + " to the module list."
+        };
     }else{
         console.log("addModule: Invalid data type received");
         console.log(data);
+        dummyResponse = {
+            response: false,
+            message: "Input type is not a module"
+        };
     }
-    response.end();
-})
+    response.end(dummyResponse);
+    // response.end();
+});
 
 var server = app.listen(80, function(){
     var host = server.address().address;
