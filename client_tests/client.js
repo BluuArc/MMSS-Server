@@ -13,7 +13,8 @@ var serverRequestOptions = {
 	host: 'localhost',
 	port: '8081',
 	path: '/',
-	method: 'GET'
+	method: 'GET',
+	use_https: false
 };
 
 //get a response from the server
@@ -21,22 +22,40 @@ function get_server_response(path,method,callbackFn){
 	serverRequestOptions.path = path;
 	serverRequestOptions.method = method;
 	var fullResponse = "";
+	var serverRequest;
 
 	//read data
-	var serverRequest = https.get(serverRequestOptions, function(serverResponse){
-		serverResponse.on('data', function(data) {
-			fullResponse += data;
-		});
+	if(serverRequestOptions.use_https){
+		serverRequest = https.get(serverRequestOptions, function(serverResponse){
+			serverResponse.on('data', function(data) {
+				fullResponse += data;
+			});
 
-		// finished reading all data
-		serverResponse.on('end', function(){
-			callbackFn(fullResponse);
-		});
+			// finished reading all data
+			serverResponse.on('end', function(){
+				callbackFn(fullResponse);
+			});
 
-		serverResponse.on('error', function(error){
-			callbackFn(JSON.stringify(error));
+			serverResponse.on('error', function(error){
+				callbackFn(JSON.stringify(error));
+			});
 		});
-	});
+	}else{
+		serverRequest = http.get(serverRequestOptions, function(serverResponse){
+			serverResponse.on('data', function(data) {
+				fullResponse += data;
+			});
+
+			// finished reading all data
+			serverResponse.on('end', function(){
+				callbackFn(fullResponse);
+			});
+
+			serverResponse.on('error', function(error){
+				callbackFn(JSON.stringify(error));
+			});
+		});
+	}
 
 	serverRequest.on('error',function(error){
 		console.log(error.stack);
@@ -64,12 +83,14 @@ app.post('/setServerOptions', urlencodedParser,function(request,response){
 		serverRequestOptions["port"] = request.body.ip_port;
 	else
 		delete serverRequestOptions["port"];
+	serverRequestOptions["use_https"] = request.body.use_https;
 	response.redirect('/');
 });
 
 app.get('/serverInfo', function(request,response){
 	response.end('Every API call will attempt to communicate with ' + 
-		serverRequestOptions.host + ":" + serverRequestOptions.port);
+		serverRequestOptions.host + ":" + serverRequestOptions.port + 
+		" using " + ((serverRequestOptions.use_https) ? "HTTPS" : "HTTP"));
 });
 
 app.get('/listModules', function(request,response){
