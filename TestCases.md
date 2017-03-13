@@ -30,7 +30,7 @@ This is a place where I keep track of the test cases used in this project.
 ```
 {
     "success":true,
-    "message":"Successfully added front door sensor (12345abcde) to the server"  
+    "message":"Successfully added 'front door sensor (12345abcde)' to the server"  
 }
 ```
 * **Intended Action:** Add a module to the current list of modules to listen to on the server.
@@ -40,14 +40,14 @@ This is a place where I keep track of the test cases used in this project.
 * **Input:** JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module.
 ``` 
 {
-    "id":"abcde12345",
+    "id":"abcde12345"
 }
  ```
 * **Output:** Success or failure message (JSON) based on the success or failure of removing a module to the list. Default return value for valid input is shown below.
 ```
 {
     "success":false,
-    "message":"Failed to remove module with ID abcde12345 because it doesn't exist in the list."
+    "message":"Failed to remove module with ID 'abcde12345' because it doesn't exist in the list."
 }
 ```
 * **Intended Action:** The method should remove the module from the list of modules to listen to on the server.
@@ -65,7 +65,7 @@ This is a place where I keep track of the test cases used in this project.
 ```
 {
     "success":true,
-    "message":"Changed module with ID abcde12345. It is now being listened to"
+    "message":"Changed module with ID 'abcde12345'. It is now being listened to"
 }
 ```
 * **Intended Action:** The method should edit some parameters of a module based on an input string.
@@ -105,3 +105,139 @@ This is a place where I keep track of the test cases used in this project.
 ]}
  ```
 * **Intended Action:** The method should list all the modules of a given type, if any exist.
+
+## Adding a User
+* **Method Tested:** `/addUser`
+* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
+``` 
+{
+    "isBeingListened":false,
+    "name":"john doe",
+    "id":"12345abcde",
+    "type":"guardian",
+    "logs":[],
+    "notifications":[]
+}
+ ```
+* **Output:** Success or failure message (JSON) based on the success or failure of adding a user to the list. Default return value for valid input is shown below.
+```
+{
+    "success":true,
+    "message":"Successfully added 'john doe' (12345abcde) to the server"  
+}
+```
+* **Intended Action:** Add a user to the current list of users to listen to on the server.
+
+## Removing a User
+* **Method Tested:** `/removeUser`
+* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+``` 
+{
+    "id":"abcde12345"
+}
+ ```
+* **Output:** Success or failure message (JSON) based on the success or failure of removing a user to the list. Default return value for valid input is shown below.
+```
+{
+    "success":false,
+    "message":"Failed to remove user with ID 'abcde12345' because it doesn't exist in the list."
+}
+```
+* **Intended Action:** The method should remove the user from the list of users to listen to on the server.
+
+## Editing a User
+* **Method Tested:** `/editUser`
+* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and any changed data.
+``` 
+{
+    "id":"abcde12345",
+    "name":"john doe ii",
+    "isBeingListened":true
+}
+ ```
+* **Output:** Success or failure message (JSON) based on the success or failure of removing a user to the list. Default return value for valid input is shown below.
+```
+{
+    "success":true,
+    "message":"Changed user with ID 'abcde12345'. It is now being listened to. It is now named 'john doe ii'."
+}
+```
+* **Intended Action:** The method should edit some parameters of a user based on an input string.
+
+## Listing All Users
+* **Method Tested:** `/listUsers`
+* **Input:** Simple connection to the `/listUsers` URL via the GET protocol.
+* **Output:** JSON string with array of users, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+``` 
+{[
+    {
+        "isBeingListened":false,
+        "name":"john doe",
+        "id":"12345abcde",
+        "type":"guardian",
+        "logs":[],
+        "notifications":[]
+    }
+]}
+ ```
+* **Intended Action:** The method should list all the users in all lists on the server.
+
+## Listing All Users of a Specific Type
+* **Method Tested:** `/listUsers/<type>`
+* **Input:** Simple connection to the `/listUsers/<type>` URL via the GET protocol. For example, this test will use `/listUsers/guardian`.
+* **Output:** JSON string with array of users, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+``` 
+{[
+    {
+        "isBeingListened":false,
+        "name":"john doe",
+        "id":"12345abcde",
+        "type":"guardian",
+        "logs":[],
+        "notifications":[]
+    }
+]}
+ ```
+* **Intended Action:** The method should list all the users of a given type, if any exist.
+
+## Requesting Logs of a User
+* **Method Tested:** `/requestUserLogs`
+* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+``` 
+{
+    "id":"abcde12345"
+}
+ ```
+* **Output:** JSON string of the requested user with the format being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. The notifications array will be empty.
+``` 
+{
+    "isBeingListened":false,
+    "name":"john doe",
+    "id":"12345abcde",
+    "type":"guardian",
+    "logs":["dummy log entry 1"],
+    "notifications":[]
+}
+ ```
+* **Intended Action:** The method should return the log data of a given user.
+
+## Requesting Notifications of a User
+* **Method Tested:** `/requestUserNotifications`
+* **Input:** JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+``` 
+{
+    "id":"abcde12345"
+}
+ ```
+* **Output:** JSON string of the requested user with the format being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. The logs array will be empty.
+``` 
+{
+    "isBeingListened":false,
+    "name":"john doe",
+    "id":"12345abcde",
+    "type":"guardian",
+    "logs":[],
+    "notifications":["dummy notification entry 1"]
+}
+ ```
+* **Intended Action:** The method should return the notification data of a given user.
