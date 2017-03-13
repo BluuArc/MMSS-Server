@@ -95,6 +95,76 @@ app.get('/listUsers/:type', function(request,response){
     // response.end("this is the list users api call for type " + request.params.type + " in the server");
 });
 
+//TODO: get better way of searching
+function isUser(json_obj){
+    return (json_obj["logs"] != undefined && json_obj["notifications"] != undefined);
+}
+
+app.post('/addUser', urlencodedParser, function(request,response){
+    var data = JSON.parse(request.body.data);
+    var dummyResponse;
+    if(isUser(data)){
+        console.log("TODO: add addUser functionality");
+        dummyResponse = {
+            response: true,
+            message: "Added " + data.id + " to the user list."
+        };
+    }else{
+        console.log("addUser: Invalid data type received");
+        console.log(data);
+        dummyResponse = {
+            response: false,
+            message: "Input type is not a user"
+        };
+    }
+    response.end(dummyResponse);
+    // response.end();
+});
+
+app.delete('/removeUser', urlencodedParser, function(request,response){
+    var data = JSON.parse(request.body.data);
+    var dummyResponse;
+    if(isUser(data)){ 
+        console.log("TODO: add removeUser functionality");
+        dummyResponse = {
+            response: true,
+            message: "Removed " + data.id + " from the user list."
+        };
+    }else{
+        console.log("removeUser: Invalid data type received");
+        console.log(data);
+        dummyResponse = {
+            response: false,
+            message: "Input type is not a user"
+        };
+    }
+    response.end(dummyResponse);
+    // response.end();
+});
+
+app.post('/editUser', urlencodedParser, function(request,response){
+    var data = JSON.parse(request.body.data);
+    var dummyResponse;
+    if(isUser(data)){
+        console.log("TODO: add editUser functionality");
+        dummyResponse = {
+            response: true,
+            message: "Changed " + data.id + " values."
+        };
+    }else{
+        console.log("editUser: Invalid data type received");
+        console.log(data);
+        dummyResponse = {
+            response: false,
+            message: "Input type is not a user"
+        };
+    }
+    response.end(dummyResponse);
+    // response.end();
+});
+
+
+
 app.get('/listModules', function(request,response){
     response.end(JSON.stringify(modules));
 });
@@ -105,11 +175,16 @@ app.get('/listModules/:type', function(request,response){
     // response.end("this is the list modules api call for type " + request.params.type + " in the server");
 });
 
+//TODO: get better way of searching
+function isModule(json_obj){
+    return (json_obj.type != undefined &&
+        json_obj.type.toLowerCase().search("module") > -1);
+}
+
 app.post('/addModule', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var type = data.type.toLowerCase();
     var dummyResponse;
-    if(type.equals("module")){
+    if(isModule(data)){
         console.log("TODO: add addModule functionality");
         dummyResponse = {
             response: true,
@@ -129,9 +204,8 @@ app.post('/addModule', urlencodedParser, function(request,response){
 
 app.delete('/removeModule', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var type = data.type.toLowerCase();
     var dummyResponse;
-    if(type.equals("module")){
+    if(isModule(data)){ 
         console.log("TODO: add removeModule functionality");
         dummyResponse = {
             response: true,
@@ -151,9 +225,8 @@ app.delete('/removeModule', urlencodedParser, function(request,response){
 
 app.post('/editModule', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var type = data.type.toLowerCase();
     var dummyResponse;
-    if(type.equals("module")){
+    if(isModule(data)){
         console.log("TODO: add editModule functionality");
         dummyResponse = {
             response: true,
