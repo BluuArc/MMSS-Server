@@ -101,14 +101,14 @@ function send_data_get_response(path, method, dataToSend, callbackFn){
 	if(method.toLowerCase() == 'post'){
 		request.post({headers:serverRequestOptions["headers"], url:url, body: dataToSend}, function(err, httpResponse,body){
 			if(err){
-				callbackFn("Error: " + err);
+				callbackFn("Error: " + err); //TODO: Fix the return value
 			}
 			console.log(body);
 			
 			console.log('TODO: Add addition functionality in helper function');
-			var response_obj = {
+			var response_obj = { //TODO: Fix return value to just the message
 				"success": true,
-				"message":"Successfully added " + my_obj["id"]
+				"message":"Successfully changed " + my_obj["id"]
 			};
 			callbackFn(JSON.stringify(response_obj));
 		});

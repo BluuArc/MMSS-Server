@@ -16,8 +16,8 @@ var argv = require('yargs')
 var users = [];
 var modules = [];
 
-var sampleUser = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"12345abcde","type":"sensormodule"}');
-var sampleModule = JSON.parse('{"isBeingListened":false,"name":"john doe","id":"12345abcde","type":"guardian","logs":["log 1"],"notifications":["note 1"]}');
+var sampleModule = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"12345abcde","type":"sensormodule"}');
+var sampleUser = JSON.parse('{"isBeingListened":false,"name":"john doe","id":"12345abcde","type":"guardian","logs":["log 1"],"notifications":["note 1"]}');
 
 // sample setup
 function WoOz_setup(){
