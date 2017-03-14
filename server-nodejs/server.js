@@ -26,6 +26,12 @@ function WoOz_setup(){
     modules.push(sampleModule);
 }
 
+// Create application/x-www-form-urlencoded parser
+// Used in functions related to POST
+var urlencodedParser = bodyParser.urlencoded({ extended: false, limit: '200mb',parameterLimit: 50000 });
+app.use(urlencodedParser);
+app.use(bodyParser.json({limit: '200mb'}));
+
 function findUser(fieldName, fieldData){
     for(u in users){
         var curUser = users[u];
@@ -78,10 +84,6 @@ function editUser(id, newData){
     }
     editUserData(user, newData);
 }
-
-// Create application/x-www-form-urlencoded parser
-// Used in functions related to POST
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 app.get('/', function(request,response){
     response.end("Welcome to the homepage.");
@@ -184,7 +186,8 @@ function isModule(json_obj){
 }
 
 app.post('/addModule', urlencodedParser, function(request,response){
-    var data = JSON.parse(request.body.data);
+    console.log(request.body);
+    var data = JSON.parse(Object.keys(request.body)[0]);
     var dummyResponse;
     if(isModule(data)){
         console.log("TODO: add addModule functionality");

@@ -3,12 +3,25 @@ var https = require('https');
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var request = require('request');
+
+var sampleModule = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"s0m3m0dul3","type":"sensormodule"}');
+var sampleUser = 
+	{
+		"isBeingListened":false,
+		"name":"john doe",
+		"id":"s0m3us3r",
+		"type":"guardian",
+		"logs":["log 1"],
+		"notifications":["note 1"]
+	};
 
 // Create application/x-www-form-urlencoded parser
 // Used in functions related to POST
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //options to be used for all tests
+//request reference: http://samwize.com/2013/08/31/simple-http-get-slash-post-request-in-node-dot-js/
 var serverRequestOptions = {
 	host: 'localhost',
 	port: '8081',
@@ -19,6 +32,8 @@ var serverRequestOptions = {
 
 //get a response from the server
 function get_server_response(path,method,callbackFn){
+	delete serverRequestOptions["headers"];
+	delete serverRequestOptions["form"];
 	serverRequestOptions.path = path;
 	serverRequestOptions.method = method;
 	var fullResponse = "";
@@ -68,6 +83,50 @@ function get_server_response(path,method,callbackFn){
 	});
 
 	serverRequest.end();
+};
+
+
+function send_data_get_response(path, method, dataToSend, callbackFn){
+	serverRequestOptions["headers"] = {
+		'Content-Type':'application/x-www-form-urlencoded'
+	};
+	serverRequestOptions["form"] = { 'data': dataToSend};
+	serverRequestOptions.path = path;
+	serverRequestOptions.method = method;
+	var fullResponse = "";
+	var my_obj = JSON.parse(dataToSend);
+
+	var url = "http://" + serverRequestOptions.host + ':' + serverRequestOptions.port + path;
+	console.log(url);
+	if(method.toLowerCase() == 'post'){
+		request.post({headers:serverRequestOptions["headers"], url:url, body: dataToSend}, function(err, httpResponse,body){
+			if(err){
+				callbackFn("Error: " + err);
+			}
+			console.log(body);
+			
+			console.log('TODO: Add addition functionality in helper function');
+			var response_obj = {
+				"success": true,
+				"message":"Successfully added " + my_obj["id"]
+			};
+			callbackFn(JSON.stringify(response_obj));
+		});
+	}else if (method.toLowerCase() == 'delete'){
+		console.log('TODO: Add delete functionality in helper function');
+		var response_obj = {
+				"success": true,
+				"message":"Successfully removed " + my_obj["id"]
+		};
+		callbackFn(JSON.stringify(response_obj));
+	}else{
+		var response_obj = {
+				"success": false,
+				"message":"Error: " + method + " is not a valid request method"
+		};
+		callbackFn(JSON.stringify(response_obj));
+		// callbackFn("Error: " + method + " is not a valid request method");
+	}	
 }
 
 //homepage
@@ -107,6 +166,27 @@ app.get('/listModules/:type', function(request,response){
 	});
 });
 
+app.get('/addModule', function(request,response){
+	var path = '/addModule';
+	send_data_get_response(path,'POST',JSON.stringify(sampleModule),function(fullResponse){
+		response.end(fullResponse);
+	});
+});
+
+app.get('/editModule', function(request,response){
+	var path = '/editModule';
+	send_data_get_response(path,'POST',JSON.stringify(sampleModule),function(fullResponse){
+		response.end(fullResponse);
+	});
+});
+
+app.get('/removeModule', function(request,response){
+	var path = '/removeModule';
+	send_data_get_response(path,'DELETE',JSON.stringify(sampleModule),function(fullResponse){
+		response.end(fullResponse);
+	});
+});
+
 app.get('/listUsers', function(request,response){
 	var path = '/listUsers';
 	get_server_response(path, 'GET', function(fullResponse){
@@ -121,6 +201,26 @@ app.get('/listUsers/:type', function(request,response){
 	});
 });
 
+app.get('/addUser', function(request,response){
+	var path = '/addUser';
+	send_data_get_response(path,'POST',JSON.stringify(sampleUser),function(fullResponse){
+		response.end(fullResponse);
+	});
+});
+
+app.get('/editUser', function(request,response){
+	var path = '/editUser';
+	send_data_get_response(path,'POST',JSON.stringify(sampleUser),function(fullResponse){
+		response.end(fullResponse);
+	});
+});
+
+app.get('/removeUser', function(request,response){
+	var path = '/removeUser';
+	send_data_get_response(path,'DELETE',JSON.stringify(sampleUser),function(fullResponse){
+		response.end(fullResponse);
+	});
+});
 
 //initialize testClient for listening for browser requests
 var testClient = app.listen(3000,function() {
