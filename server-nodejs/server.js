@@ -2,11 +2,13 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var argv = require('yargs')
-    .command('count', 'Count the lines in a file')
-    .usage('Usage: $0 -p [integer]')
+    .usage('Usage: $0 -p [integer] -i [string of IP address]')
     .default("p", 80)
+    .default("i", '127.0.0.1')
     .alias('p', 'port')
+    .alias('i', 'ip').alias('i','ip-address')
     .describe('p', 'Port to run server on')
+    .describe('i', 'IP Address to run server on')
     .help('h')
     .alias('h', 'help')
     .argv;
@@ -244,7 +246,7 @@ app.post('/editModule', urlencodedParser, function(request,response){
     // response.end();
 });
 
-var server = app.listen(argv["port"], function(){
+var server = app.listen(argv["port"], argv["ip"], function(){
     var host = server.address().address;
 	var port = server.address().port;
 
