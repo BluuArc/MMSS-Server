@@ -110,7 +110,7 @@ app.post('/addUser', urlencodedParser, function(request,response){
     if(isUser(data)){
         console.log("TODO: add addUser functionality");
         dummyResponse = {
-            response: true,
+            success: true,
             message: "Added " + data.id + " to the user list."
         };
     }else{
@@ -121,7 +121,7 @@ app.post('/addUser', urlencodedParser, function(request,response){
             message: "Input type is not a user"
         };
     }
-    response.end(dummyResponse);
+    response.end(JSON.stringify(dummyResponse));
     // response.end();
 });
 
@@ -131,7 +131,7 @@ app.delete('/removeUser', urlencodedParser, function(request,response){
     if(isUser(data)){ 
         console.log("TODO: add removeUser functionality");
         dummyResponse = {
-            response: true,
+            success: true,
             message: "Removed " + data.id + " from the user list."
         };
     }else{
@@ -142,7 +142,7 @@ app.delete('/removeUser', urlencodedParser, function(request,response){
             message: "Input type is not a user"
         };
     }
-    response.end(dummyResponse);
+    response.end(JSON.stringify(dummyResponse));
     // response.end();
 });
 
@@ -152,7 +152,7 @@ app.post('/editUser', urlencodedParser, function(request,response){
     if(isUser(data)){
         console.log("TODO: add editUser functionality");
         dummyResponse = {
-            response: true,
+            success: true,
             message: "Changed " + data.id + " values."
         };
     }else{
@@ -163,7 +163,7 @@ app.post('/editUser', urlencodedParser, function(request,response){
             message: "Input type is not a user"
         };
     }
-    response.end(dummyResponse);
+    response.end(JSON.stringify(dummyResponse));
     // response.end();
 });
 
@@ -186,13 +186,13 @@ function isModule(json_obj){
 }
 
 app.post('/addModule', urlencodedParser, function(request,response){
-    console.log(request.body);
-    var data = JSON.parse(Object.keys(request.body)[0]);
+    // console.log(request.body);
+    var data = JSON.parse(request.body.data);
     var dummyResponse;
     if(isModule(data)){
         console.log("TODO: add addModule functionality");
         dummyResponse = {
-            response: true,
+            success: true,
             message: "Added " + data.id + " to the module list."
         };
     }else{
@@ -203,7 +203,7 @@ app.post('/addModule', urlencodedParser, function(request,response){
             message: "Input type is not a module"
         };
     }
-    response.end(dummyResponse);
+    response.end(JSON.stringify(dummyResponse));
     // response.end();
 });
 
@@ -213,7 +213,7 @@ app.delete('/removeModule', urlencodedParser, function(request,response){
     if(isModule(data)){ 
         console.log("TODO: add removeModule functionality");
         dummyResponse = {
-            response: true,
+            success: true,
             message: "Removed " + data.id + " from the module list."
         };
     }else{
@@ -224,7 +224,7 @@ app.delete('/removeModule', urlencodedParser, function(request,response){
             message: "Input type is not a module"
         };
     }
-    response.end(dummyResponse);
+    response.end(JSON.stringify(dummyResponse));
     // response.end();
 });
 
@@ -234,7 +234,7 @@ app.post('/editModule', urlencodedParser, function(request,response){
     if(isModule(data)){
         console.log("TODO: add editModule functionality");
         dummyResponse = {
-            response: true,
+            success: true,
             message: "Changed " + data.id + " values."
         };
     }else{
@@ -245,7 +245,7 @@ app.post('/editModule', urlencodedParser, function(request,response){
             message: "Input type is not a module"
         };
     }
-    response.end(dummyResponse);
+    response.end(JSON.stringify(dummyResponse));
     // response.end();
 });
 

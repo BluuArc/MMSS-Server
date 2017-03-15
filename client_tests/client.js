@@ -30,7 +30,7 @@ var serverRequestOptions = {
 	use_https: false
 };
 
-//get a response from the server
+//get a response from the server (for GET methods)
 function get_server_response(path,method,callbackFn){
 	delete serverRequestOptions["headers"];
 	delete serverRequestOptions["form"];
@@ -85,47 +85,54 @@ function get_server_response(path,method,callbackFn){
 	serverRequest.end();
 };
 
+//helper function to handle responses from the server
+function handle_request_response(err, httpResponse,body,callbackFn){
+	var response_obj = {
+		success: false,
+		message: ""
+	}
 
+	if(err){
+		response_obj["message"] = err;
+		// var json_err = JSON.parse(err);
+		callbackFn(JSON.stringify(response_obj)); //TODO: Fix the return value
+	}
+	console.log(body);
+	try{
+		var json_body = JSON.parse(body);
+		callbackFn(JSON.stringify(json_body));//TODO: Fix the return value
+	}catch(err){
+		response_obj["message"] = err;
+		callbackFn(JSON.stringify(response_obj));
+	}
+}
+
+//handle sending data to the server (for POST and DELETE protocols)
 function send_data_get_response(path, method, dataToSend, callbackFn){
 	serverRequestOptions["headers"] = {
 		'Content-Type':'application/x-www-form-urlencoded'
 	};
-	serverRequestOptions["form"] = { 'data': dataToSend};
+	serverRequestOptions["form"] = { data: dataToSend};
 	serverRequestOptions.path = path;
 	serverRequestOptions.method = method;
 	var fullResponse = "";
 	var my_obj = JSON.parse(dataToSend);
+	
 
-	var url = "http://" + serverRequestOptions.host + ':' + serverRequestOptions.port + path;
-	console.log(url);
+	var url = (serverRequestOptions.use_https ? "https://" : "http://") + serverRequestOptions.host + 
+		':' + serverRequestOptions.port + path;
 	if(method.toLowerCase() == 'post'){
-		request.post({headers:serverRequestOptions["headers"], url:url, body: dataToSend}, function(err, httpResponse,body){
-			if(err){
-				callbackFn("Error: " + err); //TODO: Fix the return value
-			}
-			console.log(body);
-			
-			console.log('TODO: Add addition functionality in helper function');
-			var response_obj = { //TODO: Fix return value to just the message
-				"success": true,
-				"message":"Successfully changed " + my_obj["id"]
-			};
-			callbackFn(JSON.stringify(response_obj));
+		request.post({headers:serverRequestOptions["headers"], url:url, form: serverRequestOptions["form"]}, function(err, httpResponse,body){
+			handle_request_response(err,httpResponse,body,callbackFn);
 		});
 	}else if (method.toLowerCase() == 'delete'){
-		console.log('TODO: Add delete functionality in helper function');
-		var response_obj = {
-				"success": true,
-				"message":"Successfully removed " + my_obj["id"]
-		};
-		callbackFn(JSON.stringify(response_obj));
+		request.delete({headers:serverRequestOptions["headers"], url:url, form: serverRequestOptions["form"]}, function(err, httpResponse,body){
+			handle_request_response(err,httpResponse,body,callbackFn);
+		});
 	}else{
-		var response_obj = {
-				"success": false,
-				"message":"Error: " + method + " is not a valid request method"
-		};
+		response_obj["success"] = false;
+		response_obj["message"] = "Error: " + method + " is not a valid method";
 		callbackFn(JSON.stringify(response_obj));
-		// callbackFn("Error: " + method + " is not a valid request method");
 	}	
 }
 
