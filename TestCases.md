@@ -4,6 +4,11 @@
 
 This is a place where I keep track of the test cases used in this project.
 
+## Notes
+
+* TODO
+    * add a more uniform notification API (which includes time of notification and contents of notification)
+
 ---
 
 ## Test Case Template
@@ -223,10 +228,11 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Requesting Notifications of a User
 * **Method Tested:** `/requestUserNotifications`
-* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and the time of the last notification.
 ``` 
 {
     "id":"abcde12345"
+    "last_update_time": "< last_notification_time > (type / format?)"
 }
  ```
 * **Output:** JSON string of the requested user with the format being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. The logs array will be empty.
