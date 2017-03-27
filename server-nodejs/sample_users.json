@@ -1,0 +1,30 @@
+{
+    "blacklist": [
+        {
+            "isBeingListened": false,
+            "name": "billy bob",
+            "id": "67890fghij",
+            "type": "dependent",
+            "logs": [
+                "log 1"
+            ],
+            "notifications": [
+                "note 1"
+            ]
+        }
+    ],
+    "whitelist": [
+        {
+            "isBeingListened": false,
+            "name": "john doe",
+            "id": "12345abcde",
+            "type": "guardian",
+            "logs": [
+                "log 1"
+            ],
+            "notifications": [
+                "note 1"
+            ]
+        }
+    ]
+}

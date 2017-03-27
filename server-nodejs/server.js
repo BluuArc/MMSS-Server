@@ -22,8 +22,22 @@ var users = {
 var modules = [];
 var notifications = [];
 
+
+// Create application/x-www-form-urlencoded parser
+// Used in functions related to POST
+var urlencodedParser = bodyParser.urlencoded({ extended: false, limit: '200mb', parameterLimit: 50000 });
+app.use(urlencodedParser);
+app.use(bodyParser.json({ limit: '200mb' }));
+
+
+function get_this_server_id() {
+    var host = server.address().address.toString();
+    var port = server.address().port.toString();
+    return host + ":" + port;
+}
+
 // sample setup
-function WoOz_setup(){
+function demo_setup(){
     console.log("**NOTE:** STARTING WIZARD OF OZ DEMO");
     try{
         users = JSON.parse(load_data('sample_users.json'));
@@ -125,17 +139,6 @@ function load_data(filename, callbackFn){
     }
 }
 
-function get_this_server_id(){
-    var host = server.address().address.toString();
-    var port = server.address().port.toString();
-    return host + ":" + port;
-}
-
-// Create application/x-www-form-urlencoded parser
-// Used in functions related to POST
-var urlencodedParser = bodyParser.urlencoded({ extended: false, limit: '200mb',parameterLimit: 50000 });
-app.use(urlencodedParser);
-app.use(bodyParser.json({limit: '200mb'}));
 
 function findUser(fieldName, fieldData){
     for(u in users){
@@ -368,7 +371,7 @@ app.post('/editModule', urlencodedParser, function(request,response){
 });
 
 var server = app.listen(argv["port"], argv["ip"], function(){
-    WoOz_setup();
+    demo_setup();
 
     console.log("Server listening at http://%s", get_this_server_id());  
 });
