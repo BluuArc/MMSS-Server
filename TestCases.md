@@ -196,7 +196,7 @@ This is a place where I keep track of the test cases used in this project.
 ``` 
 [
     {
-        "isBeingListened":false,
+        "isBeingListened":true,
         "name":"john doe",
         "id":"12345abcde",
         "type":"guardian",
@@ -256,7 +256,7 @@ This is a place where I keep track of the test cases used in this project.
 ``` 
 [
     {
-        "isBeingListened":false,
+        "isBeingListened":true,
         "name":"john doe",
         "id":"12345abcde",
         "type":"guardian",
@@ -273,7 +273,7 @@ This is a place where I keep track of the test cases used in this project.
 ``` 
 [
     {
-        "isBeingListened":false,
+        "isBeingListened":true,
         "name":"john doe",
         "id":"12345abcde",
         "type":"guardian",
@@ -308,7 +308,7 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Requesting Notifications of a User
 * **Method Tested:** `/requestUserNotifications`
-* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and the time of the last notification.
+* **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and the time of the last notification.
 ``` 
 {
     "id":"abcde12345"
