@@ -100,7 +100,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Input:** Simple connection to the `/listModules` URL via the GET protocol.
 * **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
-{[
+[
     {
         "isBeingListened":true,
         "mainServerID":"123.456.789:8080",
@@ -109,7 +109,7 @@ This is a place where I keep track of the test cases used in this project.
         "id":"12345abcde",
         "type":"sensormodule"
     }
-]}
+]
  ```
 * **Intended Action:** The method should list all the modules in all lists on the server.
 
@@ -118,7 +118,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Input:** Simple connection to the `/listModules/<type>` URL via the GET protocol. For example, this test will use `/listModules/sensormodule`.
 * **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
-{[
+[
     {
         "isBeingListened":true,
         "mainServerID":"123.456.789:8080",
@@ -127,7 +127,7 @@ This is a place where I keep track of the test cases used in this project.
         "id":"12345abcde",
         "type":"sensormodule"
     }
-]}
+]
  ```
 * **Intended Action:** The method should list all the modules of a given type, if any exist.
 
@@ -194,7 +194,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Input:** Simple connection to the `/listUsers` URL via the GET protocol.
 * **Output:** JSON string with array of users, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
-{[
+[
     {
         "isBeingListened":false,
         "name":"john doe",
@@ -203,16 +203,58 @@ This is a place where I keep track of the test cases used in this project.
         "logs":[],
         "notifications":[]
     }
-]}
+]
  ```
 * **Intended Action:** The method should list all the users in all lists on the server.
 
-## Listing All Users of a Specific Type
-* **Method Tested:** `/listUsers/<type>`
-* **Input:** Simple connection to the `/listUsers/<type>` URL via the GET protocol. For example, this test will use `/listUsers/guardian`.
-* **Output:** JSON string with array of users, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+## Listing All Blacklisted Users
+* **Method Tested:** `/listUsers/blacklist`
+* **Input:** Simple connection to the `/listUsers/blacklist` URL via the GET protocol.
+* **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
-{[
+[
+    {
+        "isBeingListened": false,
+        "name": "billy bob",
+        "id": "67890fghij",
+        "type": "dependent",
+        "logs": [
+            "log 1"
+        ],
+        "notifications": [
+            "note 1"
+        ]
+    }
+]
+ ```
+
+## Listing All Blacklisted Users of a Specific Type
+* **Method Tested:** `/listUsers/blacklist/<type>`
+* **Input:** Simple connection to the `/listUsers/blacklist/<type>` URL via the GET protocol. For example, this test will use `/listUsers/blacklist/dependent`.
+* **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+``` 
+[
+    {
+        "isBeingListened": false,
+        "name": "billy bob",
+        "id": "67890fghij",
+        "type": "dependent",
+        "logs": [
+            "log 1"
+        ],
+        "notifications": [
+            "note 1"
+        ]
+    }
+]
+ ```
+
+## Listing All Whitelisted Users
+* **Method Tested:** `/listUsers/whitelist`
+* **Input:** Simple connection to the `/listUsers/whitelist` URL via the GET protocol.
+* **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+``` 
+[
     {
         "isBeingListened":false,
         "name":"john doe",
@@ -221,8 +263,26 @@ This is a place where I keep track of the test cases used in this project.
         "logs":[],
         "notifications":[]
     }
-]}
+]
  ```
+
+ ## Listing All Whitelisted Users of a Specific Type
+* **Method Tested:** `/listUsers/whitelist/<type>`
+* **Input:** Simple connection to the `/listUsers/whitelist/<type>` URL via the GET protocol. For example, this test will use `/listUsers/whitelist/guardian`.
+* **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+``` 
+[
+    {
+        "isBeingListened":false,
+        "name":"john doe",
+        "id":"12345abcde",
+        "type":"guardian",
+        "logs":[],
+        "notifications":[]
+    }
+]
+ ```
+
 * **Intended Action:** The method should list all the users of a given type, if any exist.
 
 ## Requesting Logs of a User
