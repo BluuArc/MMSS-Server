@@ -7,7 +7,27 @@ This is a place where I keep track of the test cases used in this project.
 ## Notes
 
 * TODO
-    * add a more uniform notification API (which includes time of notification and contents of notification)
+    * add a more uniform notification API (which includes time of notification and contents of notification (type and id?))
+        * Array for data for possibility of multiple links
+        * Info necessary to create a notification?
+        * Possible example notification
+```
+{
+    "success":true,
+    "message":"Successfully added 'front door sensor (12345abcde)' to the server",
+    "time": "2017-03-26 15:53:32"
+    "data":[
+        {
+            "type":"module",
+            "id":"12345abcde"
+        }
+    ]
+}
+```
+* Dates
+    * Look at [this post](http://stackoverflow.com/questions/4216745/java-string-to-date-conversion/22180505#22180505) for info related to date parsing
+    * Plan to use the following format: `yyyy-MM-dd kk:mm:ss`
+        * One example time is `2017-03-26 14:00:00` for 2 PM on March 26, 2017.
 
 ---
 
@@ -35,7 +55,7 @@ This is a place where I keep track of the test cases used in this project.
 ```
 {
     "success":true,
-    "message":"Successfully added 'front door sensor (12345abcde)' to the server"  
+    "message":"Successfully added 'front door sensor (12345abcde)' to the server"
 }
 ```
 * **Intended Action:** Add a module to the current list of modules to listen to on the server.
