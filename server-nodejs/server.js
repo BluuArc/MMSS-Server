@@ -1,6 +1,8 @@
+var fs = require('fs');
+var underscore = require('underscore'); 
+var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
-var bodyParser = require('body-parser');
 var argv = require('yargs')
     .usage('Usage: $0 -p [integer] -i [string of IP address]')
     .default("p", 80)
@@ -13,17 +15,120 @@ var argv = require('yargs')
     .alias('h', 'help')
     .argv;
 
-var users = [];
+var users = {
+    blacklist: [],
+    whitelist: []
+};
 var modules = [];
-
-var sampleModule = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"12345abcde","type":"sensormodule"}');
-var sampleUser = JSON.parse('{"isBeingListened":false,"name":"john doe","id":"12345abcde","type":"guardian","logs":["log 1"],"notifications":["note 1"]}');
+var notifications = [];
 
 // sample setup
 function WoOz_setup(){
     console.log("**NOTE:** STARTING WIZARD OF OZ DEMO");
-    users.push(sampleUser);
-    modules.push(sampleModule);
+    try{
+        users = JSON.parse(load_data('sample_users.json'));
+    }catch(err){
+        console.error("Error accessing sample_users.json. Creating file instead.");
+        users = {
+            "blacklist": [
+                {
+                    "isBeingListened": false,
+                    "name": "billy bob",
+                    "id": "67890fghij",
+                    "type": "dependent",
+                    "logs": [
+                        "log 1"
+                    ],
+                    "notifications": [
+                        "note 1"
+                    ]
+                }
+            ],
+            "whitelist": [
+                {
+                    "isBeingListened": false,
+                    "name": "john doe",
+                    "id": "12345abcde",
+                    "type": "guardian",
+                    "logs": [
+                        "log 1"
+                    ],
+                    "notifications": [
+                        "note 1"
+                    ]
+                }
+            ]
+        }
+        save_data('sample_users.json', JSON.stringify(users));
+    }
+    
+    try{
+        modules = JSON.parse(load_data('sample_modules.json'));
+    }catch(err) {
+        console.error("Error accessing sample_modules.json. Creating file instead.");
+        modules = [
+            {
+                "isBeingListened": false,
+                "mainServerID": "123.456.789:8080",
+                "name": "front door sensor",
+                "parameterData": [
+                    0
+                ],
+                "id": "12345abcde",
+                "type": "sensormodule"
+            },
+            {
+                "isBeingListened": true,
+                "mainServerID": "123.456.789:8080",
+                "name": "front door lights",
+                "parameterData": [
+                    1
+                ],
+                "id": "67890fghij",
+                "type": "interactivemodule"
+            }
+        ]
+        save_data('sample_modules.json', JSON.stringify(modules));
+    }
+    //update modules for current server ID
+    underscore.forEach(modules, function(single_module){
+        single_module["mainServerID"] = get_this_server_id();
+    })
+}
+
+//wrapper for asynchronous/synchronous file save
+function save_data(filename, object_data, callbackFn){
+    if(typeof callbackFn != "function")
+        fs.writeFileSync(filename, object_data);
+    else{
+        fs.writeFile(filename, object_data, callbackFn);
+    }
+}
+
+//wrapper for asynchronous/synchronous file load
+function load_data(filename, callbackFn){
+    if(typeof callbackFn != "function"){
+        try{
+            var data = fs.readFileSync(filename, 'utf8');
+            return data;
+        }catch(err){
+            console.error(err);
+            throw err.stack;
+        }
+    }else{
+        try {
+            var data = fs.readFile(filename, 'utf8', callbackFn);
+        } catch (err) {
+            console.error(err);
+            throw err.stack;
+        }
+    }
+}
+
+function get_this_server_id(){
+    var host = server.address().address.toString();
+    var port = server.address().port.toString();
+    return host + ":" + port;
 }
 
 // Create application/x-www-form-urlencoded parser
@@ -93,9 +198,28 @@ app.get('/listUsers', function(request,response){
     response.end(JSON.stringify(users));
 });
 
-app.get('/listUsers/:type', function(request,response){
-    console.log("TODO: add type search functionality for listUsers");
-    response.end(JSON.stringify(users));
+app.get('/listUsers/blacklist', function (request, response) {
+    response.end(JSON.stringify(users.blacklist));
+});
+
+app.get('/listUsers/blacklist/:type', function(request,response){
+    var filteredList = underscore.filter(users.blacklist,function(user){
+        return (user.type.toLowerCase() == request.params.type.toLowerCase());
+    });
+    
+    response.end(JSON.stringify(filteredList));
+    // response.end("this is the list users api call for type " + request.params.type + " in the server");
+});
+
+app.get('/listUsers/whitelist', function (request, response) {
+    response.end(JSON.stringify(users.whitelist));
+});
+
+app.get('/listUsers/whitelist/:type', function (request, response) {
+    var filteredList = underscore.filter(users.whitelist, function (user) {
+        return (user.type.toLowerCase() == request.params.type.toLowerCase());
+    });
+    response.end(JSON.stringify(filteredList));
     // response.end("this is the list users api call for type " + request.params.type + " in the server");
 });
 
@@ -117,12 +241,11 @@ app.post('/addUser', urlencodedParser, function(request,response){
         console.log("addUser: Invalid data type received");
         console.log(data);
         dummyResponse = {
-            response: false,
+            success: false,
             message: "Input type is not a user"
         };
     }
     response.end(JSON.stringify(dummyResponse));
-    // response.end();
 });
 
 app.delete('/removeUser', urlencodedParser, function(request,response){
@@ -138,12 +261,11 @@ app.delete('/removeUser', urlencodedParser, function(request,response){
         console.log("removeUser: Invalid data type received");
         console.log(data);
         dummyResponse = {
-            response: false,
+            success: false,
             message: "Input type is not a user"
         };
     }
     response.end(JSON.stringify(dummyResponse));
-    // response.end();
 });
 
 app.post('/editUser', urlencodedParser, function(request,response){
@@ -159,12 +281,11 @@ app.post('/editUser', urlencodedParser, function(request,response){
         console.log("editUser: Invalid data type received");
         console.log(data);
         dummyResponse = {
-            response: false,
+            success: false,
             message: "Input type is not a user"
         };
     }
     response.end(JSON.stringify(dummyResponse));
-    // response.end();
 });
 
 
@@ -199,12 +320,11 @@ app.post('/addModule', urlencodedParser, function(request,response){
         console.log("addModule: Invalid data type received");
         console.log(data);
         dummyResponse = {
-            response: false,
+            success: false,
             message: "Input type is not a module"
         };
     }
     response.end(JSON.stringify(dummyResponse));
-    // response.end();
 });
 
 app.delete('/removeModule', urlencodedParser, function(request,response){
@@ -220,12 +340,11 @@ app.delete('/removeModule', urlencodedParser, function(request,response){
         console.log("removeModule: Invalid data type received");
         console.log(data);
         dummyResponse = {
-            response: false,
+            success: false,
             message: "Input type is not a module"
         };
     }
     response.end(JSON.stringify(dummyResponse));
-    // response.end();
 });
 
 app.post('/editModule', urlencodedParser, function(request,response){
@@ -241,19 +360,15 @@ app.post('/editModule', urlencodedParser, function(request,response){
         console.log("editModule: Invalid data type received");
         console.log(data);
         dummyResponse = {
-            response: false,
+            success: false,
             message: "Input type is not a module"
         };
     }
     response.end(JSON.stringify(dummyResponse));
-    // response.end();
 });
 
 var server = app.listen(argv["port"], argv["ip"], function(){
-    var host = server.address().address;
-	var port = server.address().port;
-
     WoOz_setup();
 
-	console.log("Server listening at http://%s:%s", host, port);  
+    console.log("Server listening at http://%s", get_this_server_id());  
 });
