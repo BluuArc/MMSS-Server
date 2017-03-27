@@ -15,10 +15,7 @@ var argv = require('yargs')
     .alias('h', 'help')
     .argv;
 
-var users = {
-    blacklist: [],
-    whitelist: []
-};
+var users = [];
 var modules = [];
 var notifications = [];
 
@@ -39,71 +36,57 @@ function get_this_server_id() {
 // sample setup
 function demo_setup(){
     console.log("**NOTE:** STARTING WIZARD OF OZ DEMO");
-    try{
-        users = JSON.parse(load_data('sample_users.json'));
-    }catch(err){
-        console.error("Error accessing sample_users.json. Creating file instead.");
-        users = {
-            "blacklist": [
-                {
-                    "isBeingListened": false,
-                    "name": "billy bob",
-                    "id": "67890fghij",
-                    "type": "dependent",
-                    "logs": [
-                        "log 1"
-                    ],
-                    "notifications": [
-                        "note 1"
-                    ]
-                }
-            ],
-            "whitelist": [
-                {
-                    "isBeingListened": false,
-                    "name": "john doe",
-                    "id": "12345abcde",
-                    "type": "guardian",
-                    "logs": [
-                        "log 1"
-                    ],
-                    "notifications": [
-                        "note 1"
-                    ]
-                }
-            ]
-        }
-        save_data('sample_users.json', JSON.stringify(users));
-    }
-    
-    try{
-        modules = JSON.parse(load_data('sample_modules.json'));
-    }catch(err) {
-        console.error("Error accessing sample_modules.json. Creating file instead.");
-        modules = [
-            {
-                "isBeingListened": false,
-                "mainServerID": "123.456.789:8080",
-                "name": "front door sensor",
-                "parameterData": [
-                    0
-                ],
-                "id": "12345abcde",
-                "type": "sensormodule"
-            },
-            {
-                "isBeingListened": true,
-                "mainServerID": "123.456.789:8080",
-                "name": "front door lights",
-                "parameterData": [
-                    1
-                ],
-                "id": "67890fghij",
-                "type": "interactivemodule"
-            }
+    user1 = {
+        "isBeingListened": false,
+        "name": "billy bob",
+        "id": "67890fghij",
+        "type": "dependent",
+        "logs": [
+            "log 1"
+        ],
+        "notifications": [
+            "note 1"
         ]
-        save_data('sample_modules.json', JSON.stringify(modules));
-    }
+    };
+    user2 = {
+        "isBeingListened": true,
+        "name": "john doe",
+        "id": "12345abcde",
+        "type": "guardian",
+        "logs": [
+            "log 1"
+        ],
+        "notifications": [
+            "note 1"
+        ]
+    };
+    
+    addUser(user1);
+    addUser(user2);
+    users[1]["isBeingListened"] = true;
+
+    modules = [
+        {
+            "isBeingListened": false,
+            "mainServerID": "123.456.789:8080",
+            "name": "front door sensor",
+            "parameterData": [
+                0
+            ],
+            "id": "12345abcde",
+            "type": "sensormodule"
+        },
+        {
+            "isBeingListened": true,
+            "mainServerID": "123.456.789:8080",
+            "name": "front door lights",
+            "parameterData": [
+                1
+            ],
+            "id": "67890fghij",
+            "type": "interactivemodule"
+        }
+    ];
     //update modules for current server ID
     underscore.forEach(modules, function(single_module){
         single_module["mainServerID"] = get_this_server_id();
@@ -139,25 +122,82 @@ function load_data(filename, callbackFn){
     }
 }
 
+//convert a date object to the following format
+//yyyy-mm-dd hh:mm:ss
+function get_formatted_date(date){
+    function get_formatted_num(num, expected_length){
+        var str = "";
+        var num_str = num.toString();
+        var num_zeros = expected_length - num_str.length;
+        for(var i = 0; i < num_zeros; ++i){
+            str += '0';
+        }
+        str += num_str;
+        return str;
+    }
+    var msg = get_formatted_num(date.getFullYear(), 4) + "-";
+    msg += get_formatted_num(date.getMonth() + 1, 2) + "-";
+    msg += get_formatted_num(date.getDate(), 2) + " ";
+    msg += get_formatted_num(date.getHours(), 2) + ":";
+    msg += get_formatted_num(date.getMinutes(), 2) + ":";
+    msg += get_formatted_num(date.getSeconds(), 2);
+    return msg;
+}
+
+function create_notification(success,msg,objects){
+    var notification = {
+        success: success,
+        message: msg,
+        time: get_formatted_date(new Date()),
+        data: []
+    };
+
+    //add data objects, if any
+    var len = objects.length;
+    for (var i = 0; i < len; ++i) {
+        var tempObject = {
+            type: (isUser(objects[i])) ? "user" : ((isModule(objects[i])) ? "module" : "none"),
+            id: objects[i]["id"]
+        }
+        notification.data.push(tempObject);
+    }
+    return notification;
+}
+
+function notify(success,msg,objects){
+    var notification = create_notification(success,msg,objects);
+    notifications.push(notification);
+}
 
 function findUser(fieldName, fieldData){
     for(u in users){
         var curUser = users[u];
         if(curUser[fieldName] == fieldData){
-            return curUser;
+            return {
+                info: curUser,
+                index: u
+            };
         }
     }
     return null;
 }
 
 function addUser(user_obj){
-    userBlacklist.add(user_obj);
-    notifyAll("Added " + user_obj["name"] + " to the blacklist.");
+    user_obj["isBeingListened"] = false; //add to blacklist
+    users.push(user_obj);
+    notify(true,"Added " + user_obj["name"] + " to the blacklist.", [user_obj]);
 }
 
-function removeUser(user_obj){
-    userBlacklist.add(user_obj);
-    notifyAll("Added " + user_obj["name"] + " to the blacklist.");
+function removeUser(id){
+    var user = findUser('id', id);
+    //user found, so delete it
+    if(user != null){
+        var name = user.info["name"];
+        users.splice(user["index"],1);
+        notify(true,"Deleted " + name + " from the server.", [user.info]);
+    }else{
+        throw "Error: ID " + user_obj["id"] + " not found on the server.";
+    }
 }
 
 function editUserData(user, newData){
@@ -182,6 +222,7 @@ function editUserData(user, newData){
 }
 
 function editUser(id, newData){
+    console.log("TODO: add editUser functionality");
     var user = findUser('id', id);
     if(user == null){
         var result = {
@@ -197,30 +238,36 @@ app.get('/', function(request,response){
     response.end("Welcome to the homepage.");
 });
 
-app.get('/listUsers', function(request,response){
+app.get('/user/list', function(request,response){
     response.end(JSON.stringify(users));
 });
 
-app.get('/listUsers/blacklist', function (request, response) {
-    response.end(JSON.stringify(users.blacklist));
+app.get('/user/list/blacklist', function (request, response) {
+    var filteredList = underscore.filter(users, function(user){
+        return user["isBeingListened"] == false;
+    })
+    response.end(JSON.stringify(filteredList));
 });
 
-app.get('/listUsers/blacklist/:type', function(request,response){
-    var filteredList = underscore.filter(users.blacklist,function(user){
-        return (user.type.toLowerCase() == request.params.type.toLowerCase());
+app.get('/user/list/blacklist/:type', function(request,response){
+    var filteredList = underscore.filter(users,function(user){
+        return (user["isBeingListened"] == false) && (user.type.toLowerCase() == request.params.type.toLowerCase());
     });
     
     response.end(JSON.stringify(filteredList));
     // response.end("this is the list users api call for type " + request.params.type + " in the server");
 });
 
-app.get('/listUsers/whitelist', function (request, response) {
-    response.end(JSON.stringify(users.whitelist));
+app.get('/user/list/whitelist', function (request, response) {
+    var filteredList = underscore.filter(users, function (user) {
+        return user["isBeingListened"] == true;
+    })
+    response.end(JSON.stringify(filteredList));
 });
 
-app.get('/listUsers/whitelist/:type', function (request, response) {
-    var filteredList = underscore.filter(users.whitelist, function (user) {
-        return (user.type.toLowerCase() == request.params.type.toLowerCase());
+app.get('/user/list/whitelist/:type', function (request, response) {
+    var filteredList = underscore.filter(users, function (user) {
+        return (user["isBeingListened"] == true) && (user.type.toLowerCase() == request.params.type.toLowerCase());
     });
     response.end(JSON.stringify(filteredList));
     // response.end("this is the list users api call for type " + request.params.type + " in the server");
@@ -231,17 +278,17 @@ function isUser(json_obj){
     return (json_obj["logs"] != undefined && json_obj["notifications"] != undefined);
 }
 
-app.post('/addUser', urlencodedParser, function(request,response){
+app.post('/user/add', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var dummyResponse;
     if(isUser(data)){
-        console.log("TODO: add addUser functionality");
+        console.log("TODO: add user/add functionality");
         dummyResponse = {
             success: true,
             message: "Added " + data.id + " to the user list."
         };
     }else{
-        console.log("addUser: Invalid data type received");
+        console.log("user/add: Invalid data type received");
         console.log(data);
         dummyResponse = {
             success: false,
@@ -251,17 +298,17 @@ app.post('/addUser', urlencodedParser, function(request,response){
     response.end(JSON.stringify(dummyResponse));
 });
 
-app.delete('/removeUser', urlencodedParser, function(request,response){
+app.delete('/user/remove', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var dummyResponse;
     if(isUser(data)){ 
-        console.log("TODO: add removeUser functionality");
+        console.log("TODO: add user/remove functionality");
         dummyResponse = {
             success: true,
             message: "Removed " + data.id + " from the user list."
         };
     }else{
-        console.log("removeUser: Invalid data type received");
+        console.log("user/remove: Invalid data type received");
         console.log(data);
         dummyResponse = {
             success: false,
@@ -271,17 +318,17 @@ app.delete('/removeUser', urlencodedParser, function(request,response){
     response.end(JSON.stringify(dummyResponse));
 });
 
-app.post('/editUser', urlencodedParser, function(request,response){
+app.post('/user/edit', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var dummyResponse;
     if(isUser(data)){
-        console.log("TODO: add editUser functionality");
+        console.log("TODO: add user/edit functionality");
         dummyResponse = {
             success: true,
             message: "Changed " + data.id + " values."
         };
     }else{
-        console.log("editUser: Invalid data type received");
+        console.log("user/edit: Invalid data type received");
         console.log(data);
         dummyResponse = {
             success: false,
@@ -293,12 +340,12 @@ app.post('/editUser', urlencodedParser, function(request,response){
 
 
 
-app.get('/listModules', function(request,response){
+app.get('/module/list', function(request,response){
     response.end(JSON.stringify(modules));
 });
 
-app.get('/listModules/:type', function(request,response){
-    console.log("TODO: add type search functionality for listModules");
+app.get('/module/list/:type', function(request,response){
+    console.log("TODO: add type search functionality for module/list");
     response.end(JSON.stringify(modules));
     // response.end("this is the list modules api call for type " + request.params.type + " in the server");
 });
@@ -309,18 +356,18 @@ function isModule(json_obj){
         json_obj.type.toLowerCase().search("module") > -1);
 }
 
-app.post('/addModule', urlencodedParser, function(request,response){
+app.post('/module/add', urlencodedParser, function(request,response){
     // console.log(request.body);
     var data = JSON.parse(request.body.data);
     var dummyResponse;
     if(isModule(data)){
-        console.log("TODO: add addModule functionality");
+        console.log("TODO: add module/add functionality");
         dummyResponse = {
             success: true,
             message: "Added " + data.id + " to the module list."
         };
     }else{
-        console.log("addModule: Invalid data type received");
+        console.log("module/add: Invalid data type received");
         console.log(data);
         dummyResponse = {
             success: false,
@@ -330,17 +377,17 @@ app.post('/addModule', urlencodedParser, function(request,response){
     response.end(JSON.stringify(dummyResponse));
 });
 
-app.delete('/removeModule', urlencodedParser, function(request,response){
+app.delete('/module/remove', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var dummyResponse;
     if(isModule(data)){ 
-        console.log("TODO: add removeModule functionality");
+        console.log("TODO: add module/remove functionality");
         dummyResponse = {
             success: true,
             message: "Removed " + data.id + " from the module list."
         };
     }else{
-        console.log("removeModule: Invalid data type received");
+        console.log("module/remove: Invalid data type received");
         console.log(data);
         dummyResponse = {
             success: false,
@@ -350,17 +397,17 @@ app.delete('/removeModule', urlencodedParser, function(request,response){
     response.end(JSON.stringify(dummyResponse));
 });
 
-app.post('/editModule', urlencodedParser, function(request,response){
+app.post('/module/edit', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var dummyResponse;
     if(isModule(data)){
-        console.log("TODO: add editModule functionality");
+        console.log("TODO: add module/edit functionality");
         dummyResponse = {
             success: true,
             message: "Changed " + data.id + " values."
         };
     }else{
-        console.log("editModule: Invalid data type received");
+        console.log("module/edit: Invalid data type received");
         console.log(data);
         dummyResponse = {
             success: false,
@@ -369,6 +416,33 @@ app.post('/editModule', urlencodedParser, function(request,response){
     }
     response.end(JSON.stringify(dummyResponse));
 });
+
+function get_notifications_after(date_string){
+    var date = new Date(date_string);
+    // console.log(notifications);
+    // console.log("Date is " + date.toString());
+    var filteredList = underscore.filter(notifications,function(single_notif){
+        return (new Date(single_notif["time"])) >= date;
+    })
+    return filteredList;
+}
+
+app.post('/user/notifications', urlencodedParser,function(request, response){
+    var data = JSON.parse(request.body.data);
+    // console.log(data);
+    try{
+        //only allow users already in the server to query notifications
+        var user = findUser('id', data["id"]);
+        if(user.index > -1){
+            var filtered_notifications = get_notifications_after(data["last_update_time"]);
+            response.end(JSON.stringify(filtered_notifications));
+        }
+    }catch(err){
+        console.log(err);
+        response.end(JSON.stringify([]));
+    }
+    
+})
 
 var server = app.listen(argv["port"], argv["ip"], function(){
     demo_setup();

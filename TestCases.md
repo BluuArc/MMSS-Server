@@ -39,7 +39,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Notes:** The methods have slashes in front of them to indicate that we're testing a Node.JS server, instead of a Java program.
 
 ## Adding a Module
-* **Method Tested:** `/addModule`
+* **Method Tested:** `/module/add`
 * **Input:** Accesssed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
 ``` 
 {
@@ -61,7 +61,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** Add a module to the current list of modules to listen to on the server.
 
 ## Removing a Module
-* **Method Tested:** `/removeModule`
+* **Method Tested:** `/module/remove`
 * **Input:** Accessed via the DELETE protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module.
 ``` 
 {
@@ -78,7 +78,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should remove the module from the list of modules to listen to on the server.
 
 ## Editing a Module
-* **Method Tested:** `/editModule`
+* **Method Tested:** `/module/edit`
 * **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and any changed data.
 ``` 
 {
@@ -96,8 +96,8 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should edit some parameters of a module based on an input string.
 
 ## Listing All Modules
-* **Method Tested:** `/listModules`
-* **Input:** Simple connection to the `/listModules` URL via the GET protocol.
+* **Method Tested:** `/module/list`
+* **Input:** Simple connection to the `/module/list` URL via the GET protocol.
 * **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
 [
@@ -114,8 +114,8 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should list all the modules in all lists on the server.
 
 ## Listing All Modules of a Specific Type
-* **Method Tested:** `/listModules/<type>`
-* **Input:** Simple connection to the `/listModules/<type>` URL via the GET protocol. For example, this test will use `/listModules/sensormodule`.
+* **Method Tested:** `/module/list/<type>`
+* **Input:** Simple connection to the `/module/list/<type>` URL via the GET protocol. For example, this test will use `/module/list/sensormodule`.
 * **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
 [
@@ -132,7 +132,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should list all the modules of a given type, if any exist.
 
 ## Adding a User
-* **Method Tested:** `/addUser`
+* **Method Tested:** `/user/add`
 * **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
 ``` 
 {
@@ -154,7 +154,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** Add a user to the current list of users to listen to on the server.
 
 ## Removing a User
-* **Method Tested:** `/removeUser`
+* **Method Tested:** `/user/remove`
 * **Input:** Accessed via the DELETE protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
 ``` 
 {
@@ -171,7 +171,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should remove the user from the list of users to listen to on the server.
 
 ## Editing a User
-* **Method Tested:** `/editUser`
+* **Method Tested:** `/user/edit`
 * **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and any changed data.
 ``` 
 {
@@ -190,8 +190,8 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should edit some parameters of a user based on an input string.
 
 ## Listing All Users
-* **Method Tested:** `/listUsers`
-* **Input:** Simple connection to the `/listUsers` URL via the GET protocol.
+* **Method Tested:** `/user/list`
+* **Input:** Simple connection to the `/user/list` URL via the GET protocol.
 * **Output:** JSON string with array of users, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
@@ -208,8 +208,8 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should list all the users in all lists on the server.
 
 ## Listing All Blacklisted Users
-* **Method Tested:** `/listUsers/blacklist`
-* **Input:** Simple connection to the `/listUsers/blacklist` URL via the GET protocol.
+* **Method Tested:** `/user/list/blacklist`
+* **Input:** Simple connection to the `/user/list/blacklist` URL via the GET protocol.
 * **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
@@ -229,8 +229,8 @@ This is a place where I keep track of the test cases used in this project.
  ```
 
 ## Listing All Blacklisted Users of a Specific Type
-* **Method Tested:** `/listUsers/blacklist/<type>`
-* **Input:** Simple connection to the `/listUsers/blacklist/<type>` URL via the GET protocol. For example, this test will use `/listUsers/blacklist/dependent`.
+* **Method Tested:** `/user/list/blacklist/<type>`
+* **Input:** Simple connection to the `/user/list/blacklist/<type>` URL via the GET protocol. For example, this test will use `/user/list/blacklist/dependent`.
 * **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
@@ -250,8 +250,8 @@ This is a place where I keep track of the test cases used in this project.
  ```
 
 ## Listing All Whitelisted Users
-* **Method Tested:** `/listUsers/whitelist`
-* **Input:** Simple connection to the `/listUsers/whitelist` URL via the GET protocol.
+* **Method Tested:** `/user/list/whitelist`
+* **Input:** Simple connection to the `/user/list/whitelist` URL via the GET protocol.
 * **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
@@ -267,8 +267,8 @@ This is a place where I keep track of the test cases used in this project.
  ```
 
  ## Listing All Whitelisted Users of a Specific Type
-* **Method Tested:** `/listUsers/whitelist/<type>`
-* **Input:** Simple connection to the `/listUsers/whitelist/<type>` URL via the GET protocol. For example, this test will use `/listUsers/whitelist/guardian`.
+* **Method Tested:** `/user/list/whitelist/<type>`
+* **Input:** Simple connection to the `/user/list/whitelist/<type>` URL via the GET protocol. For example, this test will use `/user/list/whitelist/guardian`.
 * **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
@@ -307,7 +307,7 @@ This is a place where I keep track of the test cases used in this project.
 * **Intended Action:** The method should return the log data of a given user.
 
 ## Requesting Notifications of a User
-* **Method Tested:** `/requestUserNotifications`
+* **Method Tested:** `/user/notifications`
 * **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and the time of the last notification.
 ``` 
 {

@@ -97,7 +97,7 @@ function handle_request_response(err, httpResponse,body,callbackFn){
 		// var json_err = JSON.parse(err);
 		callbackFn(JSON.stringify(response_obj)); //TODO: Fix the return value
 	}
-	console.log(body);
+	// console.log(body);
 	try{
 		var json_body = JSON.parse(body);
 		callbackFn(JSON.stringify(json_body));//TODO: Fix the return value
@@ -159,75 +159,116 @@ app.get('/serverInfo', function(request,response){
 		" using " + ((serverRequestOptions.use_https) ? "HTTPS" : "HTTP"));
 });
 
-app.get('/listModules', function(request,response){
-	var path = '/listModules';
+app.get('/module/list', function(request,response){
+	var path = '/module/list';
 	get_server_response(path, 'GET', function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/listModules/:type', function(request,response){
-	var path = '/listModules/' + request.params.type;
+app.get('/module/list/:type', function(request,response){
+	var path = '/module/list/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/addModule', function(request,response){
-	var path = '/addModule';
+app.get('/module/add', function(request,response){
+	var path = '/module/add';
 	send_data_get_response(path,'POST',JSON.stringify(sampleModule),function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/editModule', function(request,response){
-	var path = '/editModule';
+app.get('/module/edit', function(request,response){
+	var path = '/module/edit';
 	send_data_get_response(path,'POST',JSON.stringify(sampleModule),function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/removeModule', function(request,response){
-	var path = '/removeModule';
+app.get('/module/remove', function(request,response){
+	var path = '/module/remove';
 	send_data_get_response(path,'DELETE',JSON.stringify(sampleModule),function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/listUsers', function(request,response){
-	var path = '/listUsers';
+app.get('/user/list', function(request,response){
+	var path = '/user/list';
 	get_server_response(path, 'GET', function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/listUsers/:type', function(request,response){
-	var path = '/listUsers/' + request.params.type;
+app.get('/user/list/blacklist/:type', function(request,response){
+	var path = '/user/list/blacklist/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/addUser', function(request,response){
-	var path = '/addUser';
+app.get('/user/list/whitelist/:type', function (request, response) {
+	var path = '/user/list/whitelist/' + request.params.type;
+	get_server_response(path, 'GET', function (fullResponse) {
+		response.end(fullResponse);
+	});
+});
+
+app.get('/user/add', function(request,response){
+	var path = '/user/add';
 	send_data_get_response(path,'POST',JSON.stringify(sampleUser),function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/editUser', function(request,response){
-	var path = '/editUser';
+app.get('/user/edit', function(request,response){
+	var path = '/user/edit';
 	send_data_get_response(path,'POST',JSON.stringify(sampleUser),function(fullResponse){
 		response.end(fullResponse);
 	});
 });
 
-app.get('/removeUser', function(request,response){
-	var path = '/removeUser';
+app.get('/user/remove', function(request,response){
+	var path = '/user/remove';
 	send_data_get_response(path,'DELETE',JSON.stringify(sampleUser),function(fullResponse){
 		response.end(fullResponse);
 	});
 });
+
+//convert a date object to the following format
+//yyyy-mm-dd hh:mm:ss
+function get_formatted_date(date) {
+	function get_formatted_num(num, expected_length) {
+		var str = "";
+		var num_str = num.toString();
+		var num_zeros = expected_length - num_str.length;
+		for (var i = 0; i < num_zeros; ++i) {
+			str += '0';
+		}
+		str += num_str;
+		return str;
+	}
+	var msg = get_formatted_num(date.getFullYear(), 4) + "-";
+	msg += get_formatted_num(date.getMonth() + 1, 2) + "-";
+	msg += get_formatted_num(date.getDate(), 2) + " ";
+	msg += get_formatted_num(date.getHours(), 2) + ":";
+	msg += get_formatted_num(date.getMinutes(), 2) + ":";
+	msg += get_formatted_num(date.getSeconds(), 2);
+	return msg;
+}
+
+app.get('/user/notifications', function(request,response){
+	var path = '/user/notifications';
+
+	var data = {
+		id: "12345abcde",
+		last_update_time: get_formatted_date(new Date('2017-03-01 00:00:00'))
+	};
+	send_data_get_response(path,'POST',JSON.stringify(data),function(fullResponse){
+		response.end(fullResponse);
+	})
+})
 
 //initialize testClient for listening for browser requests
 var testClient = app.listen(3000,function() {
