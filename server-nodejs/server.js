@@ -186,6 +186,7 @@ function addUser(user_obj){
     user_obj["isBeingListened"] = false; //add to blacklist
     users.push(user_obj);
     notify(true,"Added " + user_obj["name"] + " to the blacklist.", [user_obj]);
+    return true;
 }
 
 function removeUser(id){
@@ -195,8 +196,10 @@ function removeUser(id){
         var name = user.info["name"];
         users.splice(user["index"],1);
         notify(true,"Deleted " + name + " from the server.", [user.info]);
+        return true;
     }else{
-        throw "Error: ID " + user_obj["id"] + " not found on the server.";
+        return false;
+        // throw "Error: ID " + user_obj["id"] + " not found on the server.";
     }
 }
 
@@ -255,7 +258,6 @@ app.get('/user/list/blacklist/:type', function(request,response){
     });
     
     response.end(JSON.stringify(filteredList));
-    // response.end("this is the list users api call for type " + request.params.type + " in the server");
 });
 
 app.get('/user/list/whitelist', function (request, response) {
@@ -280,22 +282,24 @@ function isUser(json_obj){
 
 app.post('/user/add', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var dummyResponse;
+    var result = {
+        success: false,
+        message: ""   
+    };
     if(isUser(data)){
-        console.log("TODO: add user/add functionality");
-        dummyResponse = {
-            success: true,
-            message: "Added " + data.id + " to the user list."
-        };
+        result.success = addUser(data);
+        
+        if(result.success){
+            result.message = "Added " + data["name"] + " to the blacklist.";
+        }else{//shouldn't happen
+            result.message = "Error adding " + data["name"] + " to the server.";
+        }
     }else{
         console.log("user/add: Invalid data type received");
         console.log(data);
-        dummyResponse = {
-            success: false,
-            message: "Input type is not a user"
-        };
+        result.message = "Input type is not a user";
     }
-    response.end(JSON.stringify(dummyResponse));
+    response.end(JSON.stringify(result));
 });
 
 app.delete('/user/remove', urlencodedParser, function(request,response){
