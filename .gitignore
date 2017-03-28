@@ -1,2 +1,3 @@
 desktop.ini
 server-nodejs/node_modules
+*.class
