@@ -169,6 +169,49 @@ function notify(success,msg,objects){
     notifications.push(notification);
 }
 
+app.get('/', function (request, response) {
+    response.end("Welcome to the homepage.");
+});
+
+app.get('/user/list', function (request, response) {
+    response.end(JSON.stringify(users));
+});
+
+app.get('/user/list/blacklist', function (request, response) {
+    var filteredList = underscore.filter(users, function (user) {
+        return user["isBeingListened"] == false;
+    })
+    response.end(JSON.stringify(filteredList));
+});
+
+app.get('/user/list/blacklist/:type', function (request, response) {
+    var filteredList = underscore.filter(users, function (user) {
+        return (user["isBeingListened"] == false) && (user.type.toLowerCase() == request.params.type.toLowerCase());
+    });
+
+    response.end(JSON.stringify(filteredList));
+});
+
+app.get('/user/list/whitelist', function (request, response) {
+    var filteredList = underscore.filter(users, function (user) {
+        return user["isBeingListened"] == true;
+    })
+    response.end(JSON.stringify(filteredList));
+});
+
+app.get('/user/list/whitelist/:type', function (request, response) {
+    var filteredList = underscore.filter(users, function (user) {
+        return (user["isBeingListened"] == true) && (user.type.toLowerCase() == request.params.type.toLowerCase());
+    });
+    response.end(JSON.stringify(filteredList));
+    // response.end("this is the list users api call for type " + request.params.type + " in the server");
+});
+
+//TODO: get better way of searching
+function isUser(json_obj) {
+    return (json_obj["logs"] != undefined && json_obj["notifications"] != undefined);
+}
+
 function findUser(fieldName, fieldData){
     for(u in users){
         var curUser = users[u];
@@ -237,48 +280,7 @@ function editUser(id, newData){
     editUserData(user, newData);
 }
 
-app.get('/', function(request,response){
-    response.end("Welcome to the homepage.");
-});
 
-app.get('/user/list', function(request,response){
-    response.end(JSON.stringify(users));
-});
-
-app.get('/user/list/blacklist', function (request, response) {
-    var filteredList = underscore.filter(users, function(user){
-        return user["isBeingListened"] == false;
-    })
-    response.end(JSON.stringify(filteredList));
-});
-
-app.get('/user/list/blacklist/:type', function(request,response){
-    var filteredList = underscore.filter(users,function(user){
-        return (user["isBeingListened"] == false) && (user.type.toLowerCase() == request.params.type.toLowerCase());
-    });
-    
-    response.end(JSON.stringify(filteredList));
-});
-
-app.get('/user/list/whitelist', function (request, response) {
-    var filteredList = underscore.filter(users, function (user) {
-        return user["isBeingListened"] == true;
-    })
-    response.end(JSON.stringify(filteredList));
-});
-
-app.get('/user/list/whitelist/:type', function (request, response) {
-    var filteredList = underscore.filter(users, function (user) {
-        return (user["isBeingListened"] == true) && (user.type.toLowerCase() == request.params.type.toLowerCase());
-    });
-    response.end(JSON.stringify(filteredList));
-    // response.end("this is the list users api call for type " + request.params.type + " in the server");
-});
-
-//TODO: get better way of searching
-function isUser(json_obj){
-    return (json_obj["logs"] != undefined && json_obj["notifications"] != undefined);
-}
 
 app.post('/user/add', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
@@ -304,22 +306,18 @@ app.post('/user/add', urlencodedParser, function(request,response){
 
 app.delete('/user/remove', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var dummyResponse;
-    if(isUser(data)){ 
-        console.log("TODO: add user/remove functionality");
-        dummyResponse = {
-            success: true,
-            message: "Removed " + data.id + " from the user list."
-        };
-    }else{
-        console.log("user/remove: Invalid data type received");
-        console.log(data);
-        dummyResponse = {
-            success: false,
-            message: "Input type is not a user"
-        };
+    var result = {
+        success: false,
+        message: ""
+    };
+    result.success = removeUser(data["id"]);
+
+    if (result.success) {
+        result.message = "Removed User ID " + data["id"] + " from the server.";
+    } else {
+        result.message = "User ID " + data["id"] + " doesn't exist on the server.";
     }
-    response.end(JSON.stringify(dummyResponse));
+    response.end(JSON.stringify(result));
 });
 
 app.post('/user/edit', urlencodedParser, function(request,response){
