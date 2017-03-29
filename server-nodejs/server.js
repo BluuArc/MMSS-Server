@@ -18,6 +18,7 @@ var argv = require('yargs')
 var users = [];
 var modules = [];
 var notifications = [];
+var logs = [];
 
 
 // Create application/x-www-form-urlencoded parser
@@ -164,9 +165,39 @@ function create_notification(success,msg,objects){
     return notification;
 }
 
+function create_log_entry(source_id,success,msg,objects){
+    var logEntry = {
+        source_id: source_id,
+        success: msg,
+        time: get_formatted_date(new Date()),
+        data: []
+    }
+
+    //add data objects, if any
+    var len = objects.length;
+    for (var i = 0; i < len; ++i) {
+        var tempObject = {
+            type: (isValidUser(objects[i])) ? "user" : ((isModule(objects[i])) ? "module" : "none"),
+            id: objects[i]["id"]
+        }
+        logEntry.data.push(tempObject);
+    }
+    return logEntry;
+}
+
 function notify(success,msg,objects){
     var notification = create_notification(success,msg,objects);
     notifications.push(notification);
+}
+
+function log_new_entry(source_id,success,msg,objects){
+    var logEntry = create_log_entry(source_id,success,msg,objects);
+    logs.push(logEntry);
+}
+
+function notify_and_log(source_id,success,msg,objects){
+    notify(success,msg,objects);
+    log_new_entry(source_id,msg,objects);
 }
 
 app.get('/', function (request, response) {
@@ -233,78 +264,12 @@ function findUser(fieldName, fieldData){
     return null;
 }
 
-function addUser(user_obj){
+function addUser(user_obj) {
     user_obj["isBeingListened"] = false; //add to blacklist
     users.push(user_obj);
-    notify(true,"Added " + user_obj["name"] + " to the blacklist.", [user_obj]);
+    notify(true, "Added " + user_obj["name"] + " to the blacklist.", [user_obj]);
     return true;
 }
-
-function removeUser(id){
-    var user = findUser('id', id);
-    //user found, so delete it
-    if(user != null){
-        var name = user.info["name"];
-        users.splice(user["index"],1);
-        notify(true,"Deleted " + name + " from the server.", [user.info]);
-        return true;
-    }else{
-        return false;
-        // throw "Error: ID " + user_obj["id"] + " not found on the server.";
-    }
-}
-
-function editUser(id, newData){
-    var changeLog = [];
-    var editableFields = ["name", "type", "isBeingListened"]; //fields that are possible to change
-    var oldData = {};
-    var response = {
-        success: false,
-        message: ""
-    };
-
-    var searchResult = findUser('id', id);
-    if (searchResult == null) {
-        response.message = "User not found";
-        return response;
-    }
-    var user = searchResult.info;
-
-    //change data
-    for(f in newData){
-        if(editableFields.indexOf(f) > -1 && user[f] != null && 
-            user[f].toString().length > 0 && user[f] != newData[f]){
-            oldData[f] = user[f];
-            user[f] = newData[f];
-            if(f == "name"){
-                changeLog.push("Changed name of " + user["id"] + " to be '" + user["name"] + "'. ");
-            }else if(f == "type"){
-                changeLog.push("Changed the type of " + user["id"] + " to be " + user[f] + ". ");
-            }else if(f == "isBeingListened"){
-                changeLog.push("User " + user["id"] + " is now on the " + ((user[f] == true) ? "whitelist. " : "blacklist. "));
-            }
-        }
-    }
-
-    if(changeLog.length > 0 && isValidUser(user)){
-        response.success = true;
-        //convert changeLog to string
-        response.message = underscore.reduce(changeLog,function(acc,s){return acc + s}, "");
-    }else{
-        if(changeLog.length == 0){
-            response.message = "No changed values were detected.";
-        }else{
-            //put back oldData
-            for(f in oldData){
-                user[f] = oldData[f];
-            }
-            response.message = "One or more values were invalid.";
-        }
-    }
-    users[searchResult.index] = user;
-    return response;
-}
-
 
 app.post('/user/add', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
@@ -328,6 +293,19 @@ app.post('/user/add', urlencodedParser, function(request,response){
     response.end(JSON.stringify(result));
 });
 
+function removeUser(id) {
+    var user = findUser('id', id);
+    //user found, so delete it
+    if (user != null) {
+        var name = user.info["name"];
+        users.splice(user["index"], 1);
+        notify(true, "Deleted " + name + " from the server.", [user.info]);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 app.delete('/user/remove', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var result = {
@@ -343,6 +321,58 @@ app.delete('/user/remove', urlencodedParser, function(request,response){
     }
     response.end(JSON.stringify(result));
 });
+
+function editUser(id, newData) {
+    var changeLog = [];
+    var editableFields = ["name", "type", "isBeingListened"]; //fields that are possible to change
+    var oldData = {};
+    var response = {
+        success: false,
+        message: ""
+    };
+
+    var searchResult = findUser('id', id);
+    if (searchResult == null) {
+        response.message = "User not found";
+        return response;
+    }
+    var user = searchResult.info;
+
+    //change data
+    for (f in newData) {
+        if (editableFields.indexOf(f) > -1 && user[f] != null &&
+            user[f].toString().length > 0 && user[f] != newData[f]) {
+            oldData[f] = user[f];
+            user[f] = newData[f];
+            if (f == "name") {
+                changeLog.push("Changed name of " + user["id"] + " to be '" + user["name"] + "'. ");
+            } else if (f == "type") {
+                changeLog.push("Changed the type of " + user["id"] + " to be " + user[f] + ". ");
+            } else if (f == "isBeingListened") {
+                changeLog.push("User " + user["id"] + " is now on the " + ((user[f] == true) ? "whitelist. " : "blacklist. "));
+            }
+        }
+    }
+
+    if (changeLog.length > 0 && isValidUser(user)) {
+        response.success = true;
+        //convert changeLog to string
+        response.message = underscore.reduce(changeLog, function (acc, s) { return acc + s }, "");
+        notify(true, response.message, [user]);
+    } else {
+        if (changeLog.length == 0) {
+            response.message = "No changed values were detected.";
+        } else {
+            //put back oldData
+            for (f in oldData) {
+                user[f] = oldData[f];
+            }
+            response.message = "One or more values were invalid.";
+        }
+    }
+    users[searchResult.index] = user;
+    return response;
+}
 
 app.post('/user/edit', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
