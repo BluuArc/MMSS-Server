@@ -338,7 +338,7 @@ function editUser(id, newData) {
 
     var searchResult = findIn(users, 'id', id);
     if (searchResult == null) {
-        response.message = "User not found";
+        response.message = "User ID " + data["id"] + " not found on the server.";
         return response;
     }
     var user = searchResult.info;
@@ -493,29 +493,76 @@ app.delete('/module/remove', urlencodedParser, function(request,response){
     if(result.success){
         result.message = "Removed Module with ID " + data["id"] + " from the server.";
     }else{
-        result.message = "User ID " + data["id"] + " not found on the server.";
+        result.message = "Module ID " + data["id"] + " not found on the server.";
     }
     response.end(JSON.stringify(result));
 });
 
+function editModule(id, newData){
+    var changeLog = [];
+    var editableFields = ["name", "isBeingListened"]; //fields that are possible to change
+    var oldData = {};
+    var response = {
+        success: false,
+        message: ""
+    };
+
+    var searchResult = findIn(modules,'id',id);
+    if(searchResult == null){
+        response.message = "Module ID " + id + " not found on the server.";
+        return response;
+    }   
+
+    var found_module = searchResult.info;
+
+    //change data
+    //change data
+    for (f in newData) {
+        if (editableFields.indexOf(f) > -1 && found_module[f] != null &&
+            found_module[f].toString().length > 0 && found_module[f] != newData[f]) {
+            oldData[f] = found_module[f];
+            found_module[f] = newData[f];
+            if (f == "name") {
+                changeLog.push("Changed name of " + found_module["id"] + " to be '" + found_module["name"] + "'. ");
+            } else if (f == "isBeingListened") {
+                changeLog.push("Module " + found_module["id"] + " is now on the " + ((found_module[f] == true) ? "whitelist. " : "blacklist. "));
+            }
+        }
+    }
+
+    if (changeLog.length > 0 && isModule(found_module)) {
+        response.success = true;
+        //convert changeLog to string
+        response.message = underscore.reduce(changeLog, function (acc, s) { return acc + s }, "");
+        notify(true, response.message, [found_module]);
+    } else {
+        if (changeLog.length == 0) {
+            response.message = "No changed values were detected.";
+        } else {
+            //put back oldData
+            for (f in oldData) {
+                user[f] = oldData[f];
+            }
+            response.message = "One or more values were invalid.";
+        }
+    }
+    modules[searchResult.index] = found_module;
+    return response;    
+}
+
 app.post('/module/edit', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var dummyResponse;
-    if(isModule(data)){
-        console.log("TODO: add module/edit functionality");
-        dummyResponse = {
-            success: true,
-            message: "Changed " + data.id + " values."
-        };
-    }else{
-        console.log("module/edit: Invalid data type received");
-        console.log(data);
-        dummyResponse = {
+    var operationResult = {};
+    try{
+        operationResult = editModule(data["id"],data);
+    }catch(err){
+        console.log(err);
+        operationResult = {
             success: false,
-            message: "Input type is not a module"
+            message: "Something went wrong with the editing module operation."
         };
     }
-    response.end(JSON.stringify(dummyResponse));
+    response.end(JSON.stringify(operationResult));
 });
 
 function get_notifications_after(date_string){

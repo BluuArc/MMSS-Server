@@ -189,7 +189,10 @@ app.get('/module/add', function(request,response){
 
 app.get('/module/edit', function(request,response){
 	var path = '/module/edit';
-	send_data_get_response(path,'POST',JSON.stringify(sampleModule),function(fullResponse){
+	var tempModule = JSON.parse(JSON.stringify(sampleModule));
+	tempModule["isBeingListened"] = true;
+	tempModule["name"] = "the sensor of the front door";
+	send_data_get_response(path,'POST',JSON.stringify(tempModule),function(fullResponse){
 		response.end(fullResponse);
 	});
 });
