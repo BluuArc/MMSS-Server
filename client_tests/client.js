@@ -224,7 +224,11 @@ app.get('/user/add', function(request,response){
 
 app.get('/user/edit', function(request,response){
 	var path = '/user/edit';
-	send_data_get_response(path,'POST',JSON.stringify(sampleUser),function(fullResponse){
+	var tempEdit = JSON.parse(JSON.stringify(sampleUser));
+	tempEdit["name"] = "A brand new name";
+	tempEdit["isBeingListened"] = true;
+	tempEdit["type"] = "dependent";
+	send_data_get_response(path,'POST',JSON.stringify(tempEdit),function(fullResponse){
 		response.end(fullResponse);
 	});
 });

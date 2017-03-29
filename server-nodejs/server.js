@@ -156,7 +156,7 @@ function create_notification(success,msg,objects){
     var len = objects.length;
     for (var i = 0; i < len; ++i) {
         var tempObject = {
-            type: (isUser(objects[i])) ? "user" : ((isModule(objects[i])) ? "module" : "none"),
+            type: (isValidUser(objects[i])) ? "user" : ((isModule(objects[i])) ? "module" : "none"),
             id: objects[i]["id"]
         }
         notification.data.push(tempObject);
@@ -208,8 +208,16 @@ app.get('/user/list/whitelist/:type', function (request, response) {
 });
 
 //TODO: get better way of searching
-function isUser(json_obj) {
-    return (json_obj["logs"] != undefined && json_obj["notifications"] != undefined);
+function isValidUser(json_obj) {
+    var isValid = (json_obj["logs"] != undefined && json_obj["notifications"] != undefined);
+    if(json_obj["type"] != undefined){
+        var validTypes = ["guardian", "dependent"]
+        isValid  = isValid && (validTypes.indexOf(json_obj.type.toLowerCase() > -1));
+    }
+    if(json_obj["name"] != undefined){
+        isValid = isValid &&json_obj.name.length > 0;
+    }
+    return isValid;
 }
 
 function findUser(fieldName, fieldData){
@@ -246,40 +254,56 @@ function removeUser(id){
     }
 }
 
-function editUserData(user, newData){
-    // var message = "";
-    // var changedFields = [];
-    // var fields = ["name", "type", "isBeingListened","logs","notifications"]; //fields that are possible to change
-    // for(f in fields){
-    //     var curField = fields[f];
-    //     if(newData[curField] != undefined){
-    //         user[curField] = newData[curField];
-    //         changedFields.push(curField);
-    //     }
-    // }
-
-    // //TODO:
-    // for(f in changedFields){
-    //     if(changedFields[f] == "name"){
-    //         message += "Changed " + user["id"] + "'s name to be '" + user["name"] + "'.";
-    //     }else if (changedFields[f] == "type")
-    // }
-    
-}
-
 function editUser(id, newData){
-    console.log("TODO: add editUser functionality");
-    var user = findUser('id', id);
-    if(user == null){
-        var result = {
-            success: false,
-            message: "User not found"
-        };
-        return result;
-    }
-    editUserData(user, newData);
-}
+    var changeLog = [];
+    var editableFields = ["name", "type", "isBeingListened"]; //fields that are possible to change
+    var oldData = {};
+    var response = {
+        success: false,
+        message: ""
+    };
 
+    var searchResult = findUser('id', id);
+    if (searchResult == null) {
+        response.message = "User not found";
+        return response;
+    }
+    var user = searchResult.info;
+
+    //change data
+    for(f in newData){
+        if(editableFields.indexOf(f) > -1 && user[f] != null && 
+            user[f].toString().length > 0 && user[f] != newData[f]){
+            oldData[f] = user[f];
+            user[f] = newData[f];
+            if(f == "name"){
+                changeLog.push("Changed name of " + user["id"] + " to be '" + user["name"] + "'. ");
+            }else if(f == "type"){
+                changeLog.push("Changed the type of " + user["id"] + " to be " + user[f] + ". ");
+            }else if(f == "isBeingListened"){
+                changeLog.push("User " + user["id"] + " is now on the " + ((user[f] == true) ? "whitelist. " : "blacklist. "));
+            }
+        }
+    }
+
+    if(changeLog.length > 0 && isValidUser(user)){
+        response.success = true;
+        //convert changeLog to string
+        response.message = underscore.reduce(changeLog,function(acc,s){return acc + s}, "");
+    }else{
+        if(changeLog.length == 0){
+            response.message = "No changed values were detected.";
+        }else{
+            //put back oldData
+            for(f in oldData){
+                user[f] = oldData[f];
+            }
+            response.message = "One or more values were invalid.";
+        }
+    }
+    users[searchResult.index] = user;
+    return response;
+}
 
 
 app.post('/user/add', urlencodedParser, function(request,response){
@@ -288,7 +312,7 @@ app.post('/user/add', urlencodedParser, function(request,response){
         success: false,
         message: ""   
     };
-    if(isUser(data)){
+    if(isValidUser(data)){
         result.success = addUser(data);
         
         if(result.success){
@@ -322,22 +346,17 @@ app.delete('/user/remove', urlencodedParser, function(request,response){
 
 app.post('/user/edit', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var dummyResponse;
-    if(isUser(data)){
-        console.log("TODO: add user/edit functionality");
-        dummyResponse = {
-            success: true,
-            message: "Changed " + data.id + " values."
-        };
-    }else{
-        console.log("user/edit: Invalid data type received");
-        console.log(data);
-        dummyResponse = {
+    var operationResult = {};
+    try {
+        operationResult = editUser(data["id"], data);
+    } catch (err) { 
+        console.log(err);
+        operationResult =  {
             success: false,
-            message: "Input type is not a user"
+            message: "Something went wrong with the editing user operation."
         };
     }
-    response.end(JSON.stringify(dummyResponse));
+    response.end(JSON.stringify(operationResult));
 });
 
 
