@@ -265,10 +265,15 @@ function findIn(array, fieldName, fieldData){
 }
 
 function addUser(user_obj) {
-    user_obj["isBeingListened"] = false; //add to blacklist
-    users.push(user_obj);
-    notify(true, "Added " + user_obj["name"] + " to the blacklist.", [user_obj]);
-    return true;
+    var search = findIn(users,'id', user_obj["id"]);
+    if(search == null){
+        user_obj["isBeingListened"] = false; //add to blacklist
+        users.push(user_obj);
+        notify(true, "Added " + user_obj["name"] + " to the blacklist.", [user_obj]);
+        return true;
+    }else{//user already exists
+        return false;
+    }
 }
 
 app.post('/user/add', urlencodedParser, function(request,response){
@@ -283,7 +288,7 @@ app.post('/user/add', urlencodedParser, function(request,response){
         if(result.success){
             result.message = "Added " + data["name"] + " to the blacklist.";
         }else{//shouldn't happen
-            result.message = "Error adding " + data["name"] + " to the server.";
+            result.message = "User with ID " + data["id"] + " already exists the server.";
         }
     }else{
         console.log("user/add: Invalid data type received");
@@ -434,25 +439,42 @@ function isModule(json_obj){
         json_obj.type.toLowerCase().search("module") > -1);
 }
 
+function addModule(module_obj){
+    var search = findIn(modules, 'id', module_obj["id"]);
+    if (search == null) {
+        module_obj["isBeingListened"] = false;
+        modules.push(module_obj);
+        notify(true, "Added " + module_obj["name"] + " to the blacklist.", [module_obj]);
+        return true;
+    }else{
+        return false;
+    }
+}
+
 app.post('/module/add', urlencodedParser, function(request,response){
-    // console.log(request.body);
     var data = JSON.parse(request.body.data);
-    var dummyResponse;
+    var result = {
+        success: false,
+        message: ""
+    };
     if(isModule(data)){
-        console.log("TODO: add module/add functionality");
-        dummyResponse = {
-            success: true,
-            message: "Added " + data.id + " to the module list."
-        };
+        result.success = addModule(data);
+        if (result.success) {
+            result.message = "Added " + data["name"] + " to the blacklist.";
+        } else {//shouldn't happen
+            result.message = "Module with ID " + data["id"] + " already exists on the server.";
+        }
+        // console.log("TODO: add module/add functionality");
+        // dummyResponse = {
+        //     success: true,
+        //     message: "Added " + data.id + " to the module list."
+        // };
     }else{
         console.log("module/add: Invalid data type received");
         console.log(data);
-        dummyResponse = {
-            success: false,
-            message: "Input type is not a module"
-        };
+        result.message = "Input type is not a module";
     }
-    response.end(JSON.stringify(dummyResponse));
+    response.end(JSON.stringify(result));
 });
 
 app.delete('/module/remove', urlencodedParser, function(request,response){
