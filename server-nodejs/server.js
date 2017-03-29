@@ -322,7 +322,7 @@ app.delete('/user/remove', urlencodedParser, function(request,response){
     if (result.success) {
         result.message = "Removed User ID " + data["id"] + " from the server.";
     } else {
-        result.message = "User ID " + data["id"] + " doesn't exist on the server.";
+        result.message = "User ID " + data["id"] + " not found on the server.";
     }
     response.end(JSON.stringify(result));
 });
@@ -468,24 +468,34 @@ app.post('/module/add', urlencodedParser, function(request,response){
     response.end(JSON.stringify(result));
 });
 
+function removeModule(id){
+    var desired_module = findIn(modules, 'id',id);
+    if(desired_module != null){
+        var name = desired_module.info["name"];
+        modules.splice(desired_module["index"], 1);
+        notify(true, "Deleted " + name + " from the server.", [desired_module.info]);
+        return true;
+    }else{
+        return false;
+    }
+
+}
+
 app.delete('/module/remove', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
-    var dummyResponse;
-    if(isModule(data)){ 
-        console.log("TODO: add module/remove functionality");
-        dummyResponse = {
-            success: true,
-            message: "Removed " + data.id + " from the module list."
-        };
+    var result = {
+        success: false,
+        message: ""
+    };
+
+    result.success = removeModule(data["id"]);
+
+    if(result.success){
+        result.message = "Removed Module with ID " + data["id"] + " from the server.";
     }else{
-        console.log("module/remove: Invalid data type received");
-        console.log(data);
-        dummyResponse = {
-            success: false,
-            message: "Input type is not a module"
-        };
+        result.message = "User ID " + data["id"] + " not found on the server.";
     }
-    response.end(JSON.stringify(dummyResponse));
+    response.end(JSON.stringify(result));
 });
 
 app.post('/module/edit', urlencodedParser, function(request,response){
