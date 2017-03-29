@@ -251,13 +251,13 @@ function isValidUser(json_obj) {
     return isValid;
 }
 
-function findUser(fieldName, fieldData){
-    for(u in users){
-        var curUser = users[u];
-        if(curUser[fieldName] == fieldData){
+function findIn(array, fieldName, fieldData){
+    for(e in array){
+        var curElem = array[e];
+        if(curElem[fieldName] == fieldData){
             return {
-                info: curUser,
-                index: u
+                info: curElem,
+                index: e
             };
         }
     }
@@ -294,7 +294,7 @@ app.post('/user/add', urlencodedParser, function(request,response){
 });
 
 function removeUser(id) {
-    var user = findUser('id', id);
+    var user = findIn(users, 'id', id);
     //user found, so delete it
     if (user != null) {
         var name = user.info["name"];
@@ -331,7 +331,7 @@ function editUser(id, newData) {
         message: ""
     };
 
-    var searchResult = findUser('id', id);
+    var searchResult = findIn(users, 'id', id);
     if (searchResult == null) {
         response.message = "User not found";
         return response;
@@ -510,7 +510,7 @@ app.post('/user/notifications', urlencodedParser,function(request, response){
     // console.log(data);
     try{
         //only allow users already in the server to query notifications
-        var user = findUser('id', data["id"]);
+        var user = findIn(users, 'id', data["id"]);
         if(user.index > -1){
             var filtered_notifications = get_notifications_after(data["last_update_time"]);
             response.end(JSON.stringify(filtered_notifications));
