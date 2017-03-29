@@ -166,9 +166,16 @@ app.get('/module/list', function(request,response){
 	});
 });
 
-app.get('/module/list/:type', function(request,response){
-	var path = '/module/list/' + request.params.type;
+app.get('/module/list/blacklist/:type', function(request,response){
+	var path = '/module/list/blacklist/' + request.params.type;
 	get_server_response(path, 'GET', function(fullResponse){
+		response.end(fullResponse);
+	});
+});
+
+app.get('/module/list/whitelist/:type', function (request, response) {
+	var path = '/module/list/whitelist/' + request.params.type;
+	get_server_response(path, 'GET', function (fullResponse) {
 		response.end(fullResponse);
 	});
 });

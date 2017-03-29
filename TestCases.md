@@ -113,9 +113,45 @@ This is a place where I keep track of the test cases used in this project.
  ```
 * **Intended Action:** The method should list all the modules in all lists on the server.
 
-## Listing All Modules of a Specific Type
-* **Method Tested:** `/module/list/<type>`
-* **Input:** Simple connection to the `/module/list/<type>` URL via the GET protocol. For example, this test will use `/module/list/sensormodule`.
+## Listing All Blacklisted Modules
+* **Method Tested:** `/module/list/blacklist`
+* **Input:** Simple connection to the `/module/list/blacklist` URL via the GET protocol.
+* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
+``` 
+[
+    {
+        "isBeingListened":false,
+        "mainServerID":"123.456.789:8080",
+        "name":"rear door sensor",
+        "parameterData":[0],
+        "id":"67890fghij",
+        "type":"sensormodule"
+    }
+]
+ ```
+* **Intended Action:** The method should list all the blacklisted modules, if any exist.
+
+## Listing All Blacklisted Modules of a Specific Type
+* **Method Tested:** `/module/list/blacklist/<type>`
+* **Input:** Simple connection to the `/module/list/blacklist/<type>` URL via the GET protocol. For example, this test will use `/module/list/blacklist/sensormodule`.
+* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
+``` 
+[
+    {
+        "isBeingListened":false,
+        "mainServerID":"123.456.789:8080",
+        "name":"rear door sensor",
+        "parameterData":[0],
+        "id":"67890fghij",
+        "type":"sensormodule"
+    }
+]
+ ```
+* **Intended Action:** The method should list all the modules of a given type, if any exist.
+
+## Listing All Whitelisted Modules
+* **Method Tested:** `/module/list/whitelist`
+* **Input:** Simple connection to the `/module/list/whitelist` URL via the GET protocol.
 * **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
 [
@@ -128,7 +164,25 @@ This is a place where I keep track of the test cases used in this project.
         "type":"sensormodule"
     }
 ]
- ```
+```
+* **Intended Action:** The method should list all the whitelisted modules, if any exist.
+
+## Listing All Whitelisted Modules of a Specific Type
+* **Method Tested:** `/module/list/whitelist/<type>`
+* **Input:** Simple connection to the `/module/list/whitelist/<type>` URL via the GET protocol. For example, this test will use `/module/list/whitelist/sensormodule`.
+* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
+``` 
+[
+    {
+        "isBeingListened":true,
+        "mainServerID":"123.456.789:8080",
+        "name":"front door sensor",
+        "parameterData":[0],
+        "id":"12345abcde",
+        "type":"sensormodule"
+    }
+]
+```
 * **Intended Action:** The method should list all the modules of a given type, if any exist.
 
 ## Adding a User

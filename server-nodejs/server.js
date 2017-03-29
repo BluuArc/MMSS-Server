@@ -395,9 +395,36 @@ app.get('/module/list', function(request,response){
     response.end(JSON.stringify(modules));
 });
 
-app.get('/module/list/:type', function(request,response){
-    console.log("TODO: add type search functionality for module/list");
-    response.end(JSON.stringify(modules));
+
+app.get('/module/list/whitelist/', function(request,response){
+    var filteredList = underscore.filter(modules, function (curModule) {
+        return (curModule["isBeingListened"] == true);
+    });
+    response.end(JSON.stringify(filteredList));
+});
+
+app.get('/module/list/blacklist/', function (request, response) {
+    var filteredList = underscore.filter(modules, function (curModule) {
+        return (curModule["isBeingListened"] == false);
+    });
+    response.end(JSON.stringify(filteredList));
+});
+
+app.get('/module/list/whitelist/:type', function (request, response) {
+    // console.log("TODO: add type search functionality for module/list");
+    var filteredList = underscore.filter(modules, function (curModule) {
+        return (curModule["isBeingListened"] == true) && (curModule.type.toLowerCase() == request.params.type.toLowerCase());
+    });
+    response.end(JSON.stringify(filteredList));
+    // response.end("this is the list modules api call for type " + request.params.type + " in the server");
+});
+
+app.get('/module/list/blacklist/:type', function (request, response) {
+    // console.log("TODO: add type search functionality for module/list");
+    var filteredList = underscore.filter(modules, function (curModule) {
+        return (curModule["isBeingListened"] == false) && (curModule.type.toLowerCase() == request.params.type.toLowerCase());
+    });
+    response.end(JSON.stringify(filteredList));
     // response.end("this is the list modules api call for type " + request.params.type + " in the server");
 });
 
