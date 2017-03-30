@@ -609,8 +609,8 @@ function get_logs(startDate,endDate){
     return filteredList;
 }
 
-app.post('/module/logs', urlencodedParser, function(request,response){
-    console.log("entered module/logs")
+app.post('/logs', urlencodedParser, function(request,response){
+    // console.log("entered module/logs")
     var data = JSON.parse(request.body.data);
     try {
         //only allow users already in the server to query log data

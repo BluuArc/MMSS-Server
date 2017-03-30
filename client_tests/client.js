@@ -284,8 +284,8 @@ app.get('/notifications', function(request,response){
 	});
 });
 
-app.get('/module/logs', function (request, response) {
-	var path = '/module/logs';
+app.get('/logs', function (request, response) {
+	var path = '/logs';
 
 	var data = {
 		id: "12345abcde",
