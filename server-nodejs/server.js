@@ -565,10 +565,76 @@ app.post('/module/edit', urlencodedParser, function(request,response){
     response.end(JSON.stringify(operationResult));
 });
 
-function get_notifications_after(date_string){
-    var date = new Date(date_string);
+//check if log object has all of the expected fields, no more, no less
+function isValidLog(log_obj){
+    var expectedFields = ["id", "parameterData", "message", "time", "type"];
+    for(f in expectedFields){
+        if(log_obj[expectedFields[f]] != undefined){
+            // console.log(f + ": " + log_obj[expectedFields[f]])
+            if (expectedFields[f] != "parameterData" && log_obj[expectedFields[f]].length == 0){
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+    return true;
+}
+
+app.post('/module/log', urlencodedParser, function(request,response){
+    var data = JSON.parse(request.body.data);
+    // console.log(data);
+    var result = {
+        success: false,
+        message: ""
+    }
+    result.success = isValidLog(data);
+    if(result.success){
+        logs.push(data);
+        // console.log(logs);
+        result.message = "Successfully logged message."
+    }else{
+        result.message = "Log data isn't valid."
+    }
+    response.end(JSON.stringify(result));
+});
+
+function get_logs(startDate,endDate){
+    var start = new Date(startDate);
+    var end = new Date(endDate);
+    var filteredList = underscore.filter(logs, function (log) {
+        var curDate = new Date(log["time"]);
+        return (curDate >= start && curDate <= end);
+    });
+    return filteredList;
+}
+
+app.post('/module/logs', urlencodedParser, function(request,response){
+    console.log("entered module/logs")
+    var data = JSON.parse(request.body.data);
+    try {
+        //only allow users already in the server to query log data
+        var user = findIn(users, 'id', data["id"]);
+        if (user.index > -1) {
+            // console.log(logs);
+            var filtered_logs = get_logs(data["start_time"], data["end_time"]);
+            // console.log(filtered_logs);
+            response.end(JSON.stringify(filtered_logs));
+        }else{
+            throw "User with ID " + data["id"] + " is not found on the server.";
+        }
+    } catch (err) {
+        console.log(err);
+        response.end(JSON.stringify([]));
+    }
+});
+
+function get_notifications(startDate, endDate){
+    var start = new Date(startDate);
+    var end = new Date(endDate);
     var filteredList = underscore.filter(notifications,function(single_notif){
-        return (new Date(single_notif["time"])) >= date;
+        var curDate = new Date(single_notif["time"]);
+        return (curDate >= start && curDate <= end);
     })
     return filteredList;
 }
@@ -579,15 +645,14 @@ app.post('/user/notifications', urlencodedParser,function(request, response){
         //only allow users already in the server to query notifications
         var user = findIn(users, 'id', data["id"]);
         if(user.index > -1){
-            var filtered_notifications = get_notifications_after(data["last_update_time"]);
+            var filtered_notifications = get_notifications(data["last_update_time"], new Date());
             response.end(JSON.stringify(filtered_notifications));
         }
     }catch(err){
         console.log(err);
         response.end(JSON.stringify([]));
     }
-    
-})
+});
 
 var server = app.listen(argv["port"], argv["ip"], function(){
     demo_setup();
