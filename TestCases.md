@@ -79,18 +79,39 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Editing a Module
 * **Method Tested:** `/module/edit`
-* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and any changed data.
+* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and any changed data. A message field is necessary if a message is to be passed as well.
 ``` 
 {
     "id":"abcde12345",
     "isBeingListened":true
 }
- ```
-* **Output:** Success or failure message (JSON) based on the success or failure of removing a module to the list. Default return value for valid input is shown below.
+```
+* **Output:** Success or failure message (JSON) based on the success or failure of editing a module to the list. Default return value for valid input is shown below.
 ```
 {
     "success":true,
     "message":"Changed module with ID 'abcde12345'. It is now being listened to"
+}
+```
+* **Intended Action:** The method should edit some parameters of a module based on an input string.
+
+## Sending a Module Notification
+* **Method Tested:** `/module/log`
+* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module, the parameterList, the message, the module type, and the time of the message in the following format: yyyy-mm-dd hh:mm:ss
+``` 
+{
+    "id":"abcde12345",
+    "parameterData":[0],
+    "message": "Front door sensor was triggered",
+    "time": "2017-03-26 15:53:32",
+    "type": "sensormodule"
+}
+```
+* **Output:** Success or failure message (JSON) based on the success or failure of logging the message. Default return value for valid input is shown below.
+```
+{
+    "success":true,
+    "message":"Successfully logged message."
 }
 ```
 * **Intended Action:** The method should edit some parameters of a module based on an input string.
