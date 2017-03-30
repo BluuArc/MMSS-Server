@@ -281,8 +281,36 @@ app.get('/user/notifications', function(request,response){
 	};
 	send_data_get_response(path,'POST',JSON.stringify(data),function(fullResponse){
 		response.end(fullResponse);
-	})
-})
+	});
+});
+
+app.get('/module/logs', function (request, response) {
+	var path = '/module/logs';
+
+	var data = {
+		id: "12345abcde",
+		start_time: get_formatted_date(new Date('2017-03-01 00:00:00')),
+		end_time: get_formatted_date(new Date())
+	};
+	send_data_get_response(path, 'POST', JSON.stringify(data), function (fullResponse) {
+		response.end(fullResponse);
+	});
+});
+
+app.get('/module/log',function(request,response){
+	var path = '/module/log';
+	var data = {
+		id: "s0m3m0dul3",
+		parameterData: [1],
+		time: "2017-03-29 12:00:00",
+		message: "Front door sensor was triggered.",
+		type: "module"
+	};
+
+	send_data_get_response(path, 'POST', JSON.stringify(data), function (fullResponse) {
+		response.end(fullResponse);
+	});
+});
 
 //initialize testClient for listening for browser requests
 var testClient = app.listen(3000,function() {
