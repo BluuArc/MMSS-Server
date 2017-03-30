@@ -360,12 +360,14 @@ This is a place where I keep track of the test cases used in this project.
 
 * **Intended Action:** The method should list all the users of a given type, if any exist.
 
-## Requesting Logs of a User
-* **Method Tested:** `/requestUserLogs`
-* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+## Requesting Logs
+* **Method Tested:** `/logs`
+* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user, a start date, and an end date.
 ``` 
 {
-    "id":"abcde12345"
+    "id": "abcde12345",
+    "start_time": "2017-03-01 00:00:00",
+    "end_time": "2017-03-30 10:58:42"
 }
  ```
 * **Output:** JSON string of the requested user with the format being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. The notifications array will be empty.
