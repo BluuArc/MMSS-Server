@@ -381,8 +381,8 @@ This is a place where I keep track of the test cases used in this project.
  ```
 * **Intended Action:** The method should return the log data of a given user.
 
-## Requesting Notifications of a User
-* **Method Tested:** `/user/notifications`
+## Requesting Notifications
+* **Method Tested:** `/notifications`
 * **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and the time of the last notification.
 ``` 
 {

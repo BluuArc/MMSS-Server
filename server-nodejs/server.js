@@ -639,7 +639,7 @@ function get_notifications(startDate, endDate){
     return filteredList;
 }
 
-app.post('/user/notifications', urlencodedParser,function(request, response){
+app.post('/notifications', urlencodedParser,function(request, response){
     var data = JSON.parse(request.body.data);
     try{
         //only allow users already in the server to query notifications

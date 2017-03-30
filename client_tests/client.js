@@ -93,15 +93,15 @@ function handle_request_response(err, httpResponse,body,callbackFn){
 	}
 
 	if(err){
+		console.log(err);
 		response_obj["message"] = err;
-		// var json_err = JSON.parse(err);
-		callbackFn(JSON.stringify(response_obj)); //TODO: Fix the return value
+		callbackFn(JSON.stringify(response_obj));
 	}
-	// console.log(body);
 	try{
 		var json_body = JSON.parse(body);
-		callbackFn(JSON.stringify(json_body));//TODO: Fix the return value
+		callbackFn(JSON.stringify(json_body))
 	}catch(err){
+		console.log(err);
 		response_obj["message"] = err;
 		callbackFn(JSON.stringify(response_obj));
 	}
@@ -272,8 +272,8 @@ function get_formatted_date(date) {
 	return msg;
 }
 
-app.get('/user/notifications', function(request,response){
-	var path = '/user/notifications';
+app.get('/notifications', function(request,response){
+	var path = '/notifications';
 
 	var data = {
 		id: "12345abcde",
