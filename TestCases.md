@@ -370,16 +370,19 @@ This is a place where I keep track of the test cases used in this project.
     "end_time": "2017-03-30 10:58:42"
 }
  ```
-* **Output:** JSON string of the requested user with the format being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. The notifications array will be empty.
+* **Output:** JSON string of with array of log objects based on the [PassableLog](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below.
 ``` 
-{
-    "isBeingListened":false,
-    "name":"john doe",
-    "id":"12345abcde",
-    "type":"guardian",
-    "logs":["dummy log entry 1"],
-    "notifications":[]
-}
+[
+    {
+        "id": "s0m3m0dul3",
+        "parameterData": [
+            1
+        ],
+        "time": "2017-03-29 12:00:00",
+        "message": "Front door sensor was triggered.",
+        "type": "module"
+    }
+]
  ```
 * **Intended Action:** The method should return the log data of a given user.
 
@@ -392,15 +395,53 @@ This is a place where I keep track of the test cases used in this project.
     "last_update_time": "< last_notification_time > (type / format?)"
 }
  ```
-* **Output:** JSON string of the requested user with the format being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. The logs array will be empty.
-``` 
-{
-    "isBeingListened":false,
-    "name":"john doe",
-    "id":"12345abcde",
-    "type":"guardian",
-    "logs":[],
-    "notifications":["dummy notification entry 1"]
-}
- ```
-* **Intended Action:** The method should return the notification data of a given user.
+* **Output:** JSON string of the requested user with the format being based on the [PassableNotification](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below.
+```
+[
+    {
+        "success": true,
+        "message": "Added billy bob to the blacklist.",
+        "time": "2017-03-30 08:58:36",
+        "data": [
+            {
+                "type": "user",
+                "id": "67890fghij"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Added john doe to the blacklist.",
+        "time": "2017-03-30 08:58:36",
+        "data": [
+            {
+                "type": "user",
+                "id": "12345abcde"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Added front door sensor to the blacklist.",
+        "time": "2017-03-30 08:58:36",
+        "data": [
+            {
+                "type": "module",
+                "id": "12345abcde"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Added front door lights to the blacklist.",
+        "time": "2017-03-30 08:58:36",
+        "data": [
+            {
+                "type": "module",
+                "id": "67890fghij"
+            }
+        ]
+    }
+]
+```
+* **Intended Action:** The method should return the notification data.
