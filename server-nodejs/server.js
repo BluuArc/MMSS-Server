@@ -4,13 +4,19 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
 var argv = require('yargs')
-    .usage('Usage: $0 -p [integer] -i [string of IP address]')
+    .usage('Usage: $0 -p [integer] -i [string of IP address] [--debug] [--demo]')
     .default("p", 80)
     .default("i", '127.0.0.1')
+    .default("d", false)
+    .default("w", false)
     .alias('p', 'port')
     .alias('i', 'ip').alias('i','ip-address')
+    .alias('w',"demo") //originally Wizard of Oz function
+    .alias('d', 'debug')
     .describe('p', 'Port to run server on')
     .describe('i', 'IP Address to run server on')
+    .describe('w', 'Demo/Wizard of Oz mode; prepopulate the lists with demo data')
+    .describe('d', 'Debug mode; allows manual saving of data.')
     .help('h')
     .alias('h', 'help')
     .argv;
@@ -36,35 +42,28 @@ function get_this_server_id() {
 
 // sample setup
 function demo_setup(){
-    console.log("**NOTE:** STARTING WIZARD OF OZ DEMO");
+    console.log("**NOTE:** STARTING DEMO MODE");
     user1 = {
         "isBeingListened": false,
         "name": "billy bob",
         "id": "67890fghij",
         "type": "dependent",
-        "logs": [
-            "log 1"
-        ],
-        "notifications": [
-            "note 1"
-        ]
+        "logs": [],
+        "notifications": []
     };
     user2 = {
         "isBeingListened": true,
         "name": "john doe",
         "id": "12345abcde",
         "type": "guardian",
-        "logs": [
-            "log 1"
-        ],
-        "notifications": [
-            "note 1"
-        ]
+        "logs": [],
+        "notifications": []
     };
     
     addUser(user1);
     addUser(user2);
-    users[1]["isBeingListened"] = true;
+    editUser(user2["id"], user2);
+    // users[1]["isBeingListened"] = true;
 
     module1 =  {
         "isBeingListened": false,
@@ -88,8 +87,11 @@ function demo_setup(){
     }
     addModule(module1);
     addModule(module2);
-    modules[1]["isBeingListened"] = true;
+    editModule(module2["id"],module2);
+    // modules[1]["isBeingListened"] = true;
+
     //update modules for current server ID
+    //this will be done manually on client side
     underscore.forEach(modules, function(single_module){
         single_module["mainServerID"] = get_this_server_id();
     })
@@ -196,13 +198,39 @@ function log_new_entry(source_id,success,msg,objects){
     logs.push(logEntry);
 }
 
-function notify_and_log(source_id,success,msg,objects){
-    notify(success,msg,objects);
-    log_new_entry(source_id,msg,objects);
+function notify_and_log(source_id,success,notif_msg,log_msg,objects){
+    notify(success,notif_msg,objects);
+    log_new_entry(source_id,log_msg,objects);
 }
 
 app.get('/', function (request, response) {
     response.end("Welcome to the homepage.");
+});
+
+app.get('/save', function(request,response){
+    var msg = {
+        success: false,
+        message: ""
+    };
+    if(argv["debug"]){
+        save_data("debug_users.json",JSON.stringify(users),function(){
+            console.log("Saved debug_user.json");
+        });
+        save_data("debug_modules.json", JSON.stringify(modules), function(){
+            console.log("Saved debug_modules.json");
+        });
+        save_data("debug_logs.json", JSON.stringify(logs), function(){
+            console.log("Saved debug_logs.json");
+        });
+        save_data("debug_notifications.json", JSON.stringify(notifications), function(){
+            console.log("Saved debug_notifications.json");
+        });
+        msg.success = true;
+        msg.message = "Saving data. Please refer to server console output for more info.";
+    }else{
+        msg.message = "Debug mode not enabled. Please enable debug mode to use this function.";
+    }
+    response.end(JSON.stringify(msg));
 });
 
 app.get('/user/list', function (request, response) {
@@ -338,7 +366,7 @@ function editUser(id, newData) {
 
     var searchResult = findIn(users, 'id', id);
     if (searchResult == null) {
-        response.message = "User ID " + data["id"] + " not found on the server.";
+        response.message = "User ID " + id + " not found on the server.";
         return response;
     }
     var user = searchResult.info;
@@ -655,7 +683,11 @@ app.post('/notifications', urlencodedParser,function(request, response){
 });
 
 var server = app.listen(argv["port"], argv["ip"], function(){
-    demo_setup();
+    if(argv["debug"])
+        console.log("Debug mode is on.");
+
+    if(argv["demo"])
+        demo_setup();
 
     console.log("Server listening at http://%s", get_this_server_id());  
 });
