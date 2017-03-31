@@ -8,6 +8,10 @@ var request = require('request');
 // var sampleModule = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"s0m3m0dul3","type":"sensormodule"}');
 var sampleModule = 
 	{
+		editor_info: {
+			id: "s0m3us3r",
+			type: "guardian"
+		},
 		isBeingListened: false,
 		mainServerID: "123.456.789:8080",
 		name: "front door sensor",
