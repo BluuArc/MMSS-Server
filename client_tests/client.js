@@ -5,15 +5,31 @@ var app = express();
 var bodyParser = require('body-parser');
 var request = require('request');
 
-var sampleModule = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"s0m3m0dul3","type":"sensormodule"}');
+// var sampleModule = JSON.parse('{"isBeingListened":false,"mainServerID":"123.456.789:8080","name":"front door sensor","parameterData":[0],"id":"s0m3m0dul3","type":"sensormodule"}');
+var sampleModule = 
+	{
+		isBeingListened: false,
+		mainServerID: "123.456.789:8080",
+		name: "front door sensor",
+		parameterData: [
+			0
+		],
+		id: "s0m3m0dul3",
+		type: "sensormodule"
+	}
 var sampleUser = 
 	{
-		"isBeingListened":false,
-		"name":"john doe",
-		"id":"s0m3us3r",
-		"type":"guardian",
-		"logs":[],
-		"notifications":[]
+		editor_info:{
+			id: "s0m3us3r",
+			type: "guardian"
+		},
+		name:"john doe",
+		id:"s0m3us3r",
+		type:"guardian",
+		logs:[],
+		notifications:[],
+		isBeingListened: false,
+		last_update_time: "2017-03-25 12:34:56"
 	};
 
 // Create application/x-www-form-urlencoded parser
@@ -300,11 +316,14 @@ app.get('/logs', function (request, response) {
 app.get('/module/log',function(request,response){
 	var path = '/module/log';
 	var data = {
-		id: "s0m3m0dul3",
-		parameterData: [1],
+		author_info:  {
+			id: "s0m3m0dul3",
+			type: "module"
+		},
+		data: [1],
 		time: "2017-03-29 12:00:00",
 		message: "Front door sensor was triggered.",
-		type: "module"
+		subject_type: "module"
 	};
 
 	send_data_get_response(path, 'POST', JSON.stringify(data), function (fullResponse) {

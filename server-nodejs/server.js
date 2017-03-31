@@ -44,20 +44,30 @@ function get_this_server_id() {
 function demo_setup(){
     console.log("**NOTE:** STARTING DEMO MODE");
     user1 = {
-        "isBeingListened": false,
-        "name": "billy bob",
-        "id": "67890fghij",
-        "type": "dependent",
-        "logs": [],
-        "notifications": []
+        editor_info: {
+            id: "4dminu53r",
+            type: "user"
+        },
+        name: "billy bob",
+        id: "67890fghij",
+        type: "dependent",
+        logs: [],
+        notifications: [],
+        isBeingListened: false,
+        last_update_time: "2017-03-20 12:34:56"
     };
     user2 = {
-        "isBeingListened": true,
-        "name": "john doe",
-        "id": "12345abcde",
-        "type": "guardian",
-        "logs": [],
-        "notifications": []
+        editor_info: {
+            id: "l33tgu4rd1an",
+            type: "user"
+        },
+        name: "john doe",
+        id: "12345abcde",
+        type: "guardian",
+        logs: [],
+        notifications: [],
+        isBeingListened: true,
+        last_update_time: get_formatted_date(new Date())
     };
     
     addUser(user1);
@@ -66,24 +76,32 @@ function demo_setup(){
     // users[1]["isBeingListened"] = true;
 
     module1 =  {
-        "isBeingListened": false,
-        "mainServerID": "123.456.789:8080",
-        "name": "front door sensor",
-        "parameterData": [
+        editor_info: {
+            id: "4dminu53r",
+            type: "user"
+        },
+        name: "front door sensor",
+        type: "sensormodule",
+        id: "12345abcde",
+        mainServerID: "123.456.789:8080",
+        parameterData: [
             0
         ],
-        "id": "12345abcde",
-        "type": "sensormodule"
+        isBeingListened: false,
     }
     module2 = {
-        "isBeingListened": true,
-        "mainServerID": "123.456.789:8080",
-        "name": "front door lights",
-        "parameterData": [
+        editor_info: {
+            id: "l33tgu4rd1an",
+            type: "user"
+        },
+        mainServerID: "123.456.789:8080",
+        name: "front door lights",
+        parameterData: [
             1
         ],
-        "id": "67890fghij",
-        "type": "interactivemodule"
+        id: "67890fghij",
+        type: "interactivemodule",
+        isBeingListened: true,
     }
     addModule(module1);
     addModule(module2);
@@ -594,14 +612,20 @@ app.post('/module/edit', urlencodedParser, function(request,response){
 
 //check if log object has all of the expected fields, no more, no less
 function isValidLog(log_obj){
-    var expectedFields = ["id", "parameterData", "message", "time", "type"];
+    var expectedFields = ["data", "message", "time", "subject_type", "author_info"];
     for(f in expectedFields){
         if(log_obj[expectedFields[f]] != undefined){
             // console.log(f + ": " + log_obj[expectedFields[f]])
-            if (expectedFields[f] != "parameterData" && log_obj[expectedFields[f]].length == 0){
+            if (expectedFields[f] != "data" && log_obj[expectedFields[f]].length == 0){
                 return false;
             }
         }else{
+            return false;
+        }
+    }
+
+    for(f in log_obj){
+        if(expectedFields.indexOf(f) == -1){
             return false;
         }
     }
