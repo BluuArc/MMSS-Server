@@ -12,8 +12,8 @@ var sampleUser =
 		"name":"john doe",
 		"id":"s0m3us3r",
 		"type":"guardian",
-		"logs":["log 1"],
-		"notifications":["note 1"]
+		"logs":[],
+		"notifications":[]
 	};
 
 // Create application/x-www-form-urlencoded parser
