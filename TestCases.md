@@ -6,24 +6,6 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Notes
 
-* TODO
-    * add a more uniform notification API (which includes time of notification and contents of notification (type and id?))
-        * Array for data for possibility of multiple links
-        * Info necessary to create a notification?
-        * Possible example notification
-```
-{
-    "success":true,
-    "message":"Successfully added 'front door sensor (12345abcde)' to the server",
-    "time": "2017-03-26 15:53:32"
-    "data":[
-        {
-            "type":"module",
-            "id":"12345abcde"
-        }
-    ]
-}
-```
 * Dates
     * Look at [this post](http://stackoverflow.com/questions/4216745/java-string-to-date-conversion/22180505#22180505) for info related to date parsing
     * Plan to use the following format: `yyyy-MM-dd kk:mm:ss`
@@ -32,7 +14,7 @@ This is a place where I keep track of the test cases used in this project.
 ---
 
 ## Test Case Template
-* **Method Tested:** `/methodName`
+* **Method Tested:** `/url/path/to/method`
 * **Input:** input parameters for method
 * **Output:** expected output for method based on input
 * **Intended Action:** what the method is supposed to do
