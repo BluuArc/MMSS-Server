@@ -168,11 +168,15 @@ function create_notification(success,msg,objects){
     return notification;
 }
 
-function create_log_entry(source_id,success,msg,objects){
+function create_log_entry(author_info,subject_type,msg,objects){
     var logEntry = {
-        source_id: source_id,
-        success: msg,
+        author_info:{
+            id: author_info["id"],
+            type: author_info["type"]
+        },
+        message: msg,
         time: get_formatted_date(new Date()),
+        subject_type: subject_type,
         data: []
     }
 
@@ -196,11 +200,6 @@ function notify(success,msg,objects){
 function log_new_entry(source_id,success,msg,objects){
     var logEntry = create_log_entry(source_id,success,msg,objects);
     logs.push(logEntry);
-}
-
-function notify_and_log(source_id,success,notif_msg,log_msg,objects){
-    notify(success,notif_msg,objects);
-    log_new_entry(source_id,log_msg,objects);
 }
 
 app.get('/', function (request, response) {
