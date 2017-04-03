@@ -2,3 +2,4 @@ desktop.ini
 server-nodejs/node_modules
 *.class
 server-nodejs/debug_*.json
+web_client/node_modules
