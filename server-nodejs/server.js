@@ -3,6 +3,8 @@ var underscore = require('underscore');
 var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 var argv = require('yargs')
     .usage('Usage: $0 -p [integer] -i [string of IP address] [--debug] [--demo]')
     .default("p", 80)
@@ -26,12 +28,36 @@ var modules = [];
 var notifications = [];
 var logs = [];
 
+//live chat functionaliy initially based off of Socket IO tutorial
+//https://socket.io/get-started/chat/
+io.on('connection', function (socket) {
+    console.log('A user connected');    
+
+    socket.on('disconnect', function () {
+        console.log('A user disconnected');
+    });
+    socket.on('chat message', function (msg) {
+        console.log('message: ' + msg);
+        io.emit('chat message', msg);
+    });
+});
+
+//broadcast a message to users
+function broadcast(msg, formattingFunction){
+    if(argv["debug"]){
+        var result = msg;
+        if (formattingFunction != undefined)
+            result = formattingFunction(msg);
+        io.emit('chat message', result);
+    }
+}
 
 // Create application/x-www-form-urlencoded parser
 // Used in functions related to POST
 var urlencodedParser = bodyParser.urlencoded({ extended: false, limit: '200mb', parameterLimit: 50000 });
 app.use(urlencodedParser);
 app.use(bodyParser.json({ limit: '200mb' }));
+app.use(express.static('frontend'));
 
 var server_info = null;
 function get_this_server_info() {
@@ -223,15 +249,25 @@ function create_log_entry(author_info,subject_type,msg,objects){
 function notify(success,msg,objects){
     var notification = create_notification(success,msg,objects);
     notifications.push(notification);
+    broadcast(notification, function(notification){
+        return "[" + notification["time"] + "] " + (notification["success"] ? "SUCCESS" : "FAIL") +" NOTIF: " + 
+            notification["message"];
+    });
 }
 
 function log_new_entry(source_info,subject_type,msg,objects){
     var logEntry = create_log_entry(source_info,subject_type,msg,objects);
     logs.push(logEntry);
+    broadcast(logEntry,function(logEntry){
+        return "[" + logEntry["time"] + "] LOG: " + logEntry["message"];
+    });
 }
 
 app.get('/', function (request, response) {
-    response.end("Welcome to the homepage.");
+    if (argv["debug"])
+        response.sendFile(__dirname + "/index.html"); //debug viewer
+    else
+        response.end("Welcome to the homepage.");
 });
 
 app.get('/save', function(request,response){
@@ -371,6 +407,7 @@ app.post('/user/add', urlencodedParser, function(request,response){
 });
 
 function hasPermission(editor_info){
+    // console.log(editor_info);
     //ensure all fields exist
     if (editor_info == undefined || editor_info["id"] == undefined || editor_info["type"] == undefined) {
         return false;
@@ -796,7 +833,7 @@ app.post('/notifications', urlencodedParser,function(request, response){
     }
 });
 
-var server = app.listen(argv["port"], argv["ip"], function(){
+server.listen(argv["port"], argv["ip"], function(){
     if(argv["debug"])
         console.log("Debug mode is on.");
 
