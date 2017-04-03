@@ -33,11 +33,17 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false, limit: '200mb', 
 app.use(urlencodedParser);
 app.use(bodyParser.json({ limit: '200mb' }));
 
-
-function get_this_server_id() {
-    var host = server.address().address.toString();
-    var port = server.address().port.toString();
-    return host + ":" + port;
+var server_info = null;
+function get_this_server_info() {
+    if(server_info == null){
+        var host = server.address().address.toString();
+        var port = server.address().port.toString();
+        server_info = {
+            id: host + ":" + port,
+            type: "server"
+        }
+    }
+    return server_info;
 }
 
 // sample setup
@@ -70,9 +76,11 @@ function demo_setup(){
         last_update_time: get_formatted_date(new Date())
     };
     
-    addUser(user1);
     addUser(user2);
-    editUser(user2["id"], user2);
+    addUser(user1);
+    var tempUser = JSON.parse(JSON.stringify(user2));
+    tempUser["isBeingListened"] = true;
+    editUser(tempUser["id"], tempUser);
     // users[1]["isBeingListened"] = true;
 
     module1 =  {
@@ -105,13 +113,15 @@ function demo_setup(){
     }
     addModule(module1);
     addModule(module2);
-    editModule(module2["id"],module2);
+    var tempModule = JSON.parse(JSON.stringify(module2));
+    tempModule["isBeingListened"] = true;
+    editModule(tempModule["id"],tempModule);
     // modules[1]["isBeingListened"] = true;
 
     //update modules for current server ID
     //this will be done manually on client side
     underscore.forEach(modules, function(single_module){
-        single_module["mainServerID"] = get_this_server_id();
+        single_module["mainServerID"] = get_this_server_info()["id"];
     })
 }
 
@@ -215,8 +225,8 @@ function notify(success,msg,objects){
     notifications.push(notification);
 }
 
-function log_new_entry(source_id,success,msg,objects){
-    var logEntry = create_log_entry(source_id,success,msg,objects);
+function log_new_entry(source_info,subject_type,msg,objects){
+    var logEntry = create_log_entry(source_info,subject_type,msg,objects);
     logs.push(logEntry);
 }
 
@@ -231,15 +241,19 @@ app.get('/save', function(request,response){
     };
     if(argv["debug"]){
         save_data("debug_users.json",JSON.stringify(users),function(){
+            log_new_entry(get_this_server_info(), "server","Saved debug_user.json",[]);
             console.log("Saved debug_user.json");
         });
         save_data("debug_modules.json", JSON.stringify(modules), function(){
+            log_new_entry(get_this_server_info(), "server", "Saved debug_modules.json", []);
             console.log("Saved debug_modules.json");
         });
         save_data("debug_logs.json", JSON.stringify(logs), function(){
+            log_new_entry(get_this_server_info(), "server", "Saved debug_logs.json", []);
             console.log("Saved debug_logs.json");
         });
         save_data("debug_notifications.json", JSON.stringify(notifications), function(){
+            log_new_entry(get_this_server_info(), "server", "Saved debug_notifications.json", []);
             console.log("Saved debug_notifications.json");
         });
         msg.success = true;
@@ -314,9 +328,18 @@ function addUser(user_obj) {
     if(search == null){
         user_obj["isBeingListened"] = false; //add to blacklist
         users.push(user_obj);
-        notify(true, "Added " + user_obj["name"] + " to the blacklist.", [user_obj]);
+        if (users.length == 1) {//if new user is the first user, automatically elevate their permissions
+            users[0]["isBeingListened"] = true;
+            users[0]["type"] = "guardian";
+        }
+
+        var msg = "Added " + user_obj["name"] + " to the blacklist.";
+        notify(true, msg, [user_obj]);
+        log_new_entry(get_this_server_info(),"user",msg,[user_obj]);
         return true;
     }else{//user already exists
+        var msg = "Attempted to add user " + user_obj["name"] + " to the server, but " + user_obj["id"] + " already exists.";
+        log_new_entry(get_this_server_info(),"user", msg,[]);
         return false;
     }
 }
@@ -331,7 +354,11 @@ app.post('/user/add', urlencodedParser, function(request,response){
         result.success = addUser(data);
         
         if(result.success){
-            result.message = "Added " + data["name"] + " to the blacklist.";
+            if(users.length > 1){
+                result.message = "Added " + data["name"] + " to the blacklist.";
+            }else{
+                result.message = "Added " + data["name"] + " to the whitelist.";
+            }
         }else{
             result.message = "User with ID " + data["id"] + " already exists the server.";
         }
@@ -343,32 +370,65 @@ app.post('/user/add', urlencodedParser, function(request,response){
     response.end(JSON.stringify(result));
 });
 
-function removeUser(id) {
+function hasPermission(editor_info){
+    //ensure all fields exist
+    if (editor_info == undefined || editor_info["id"] == undefined || editor_info["type"] == undefined) {
+        return false;
+    }
+    // console.log("Finding editor");
+    var editor = null;
+    //check if editor exists on the server
+    if(editor_info["type"] == "user"){
+        editor = findIn(users,'id',editor_info["id"]);
+    }else if(editor_info["type"] == "module"){
+        editor = findIn(modules, 'id', editor_info["id"]);
+    }
+    if(editor == null){
+        return false;
+    }
+
+    //check if editor isn't blacklisted
+    return editor.info["isBeingListened"];
+}
+
+function removeUser(id, editor_info) {
     var user = findIn(users, 'id', id);
+    
     //user found, so delete it
     if (user != null) {
         var name = user.info["name"];
         users.splice(user["index"], 1);
-        notify(true, "Deleted " + name + " from the server.", [user.info]);
+        var msg = "Deleted " + name + " from the server.";
+        notify(true,msg, [user.info]);
+        log_new_entry(editor_info,"user",msg,[user.info]);
         return true;
     } else {
+        var msg = "Can't delete user ID " + id + " from the server because it wasn't found";
+        log_new_entry(editor_info,"user",msg,[{type:"user",id:id}]);
         return false;
     }
 }
 
 app.delete('/user/remove', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
+    // console.log(data);
     var result = {
         success: false,
         message: ""
     };
-    result.success = removeUser(data["id"]);
+    if(hasPermission(data["editor_info"])){
+        result.success = removeUser(data["id"], data["editor_info"]);
 
-    if (result.success) {
-        result.message = "Removed User ID " + data["id"] + " from the server.";
-    } else {
-        result.message = "User ID " + data["id"] + " not found on the server.";
+        if (result.success) {
+            result.message = "Removed User ID " + data["id"] + " from the server.";
+        } else {
+            result.message = "User ID " + data["id"] + " not found on the server.";
+        }
+    }else{
+        result.message = "Editor info is invalid or doesn't have correct permissions.";
     }
+
+    
     response.end(JSON.stringify(result));
 });
 
@@ -384,6 +444,7 @@ function editUser(id, newData) {
     var searchResult = findIn(users, 'id', id);
     if (searchResult == null) {
         response.message = "User ID " + id + " not found on the server.";
+        log_new_entry(newData["editor_info"], "user", response.message, [newData]);
         return response;
     }
     var user = searchResult.info;
@@ -420,6 +481,7 @@ function editUser(id, newData) {
             response.message = "One or more values were invalid.";
         }
     }
+    log_new_entry(newData["editor_info"], "user", response.message, [newData]);
     users[searchResult.index] = user;
     return response;
 }
@@ -427,14 +489,21 @@ function editUser(id, newData) {
 app.post('/user/edit', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var operationResult = {};
-    try {
-        operationResult = editUser(data["id"], data);
-    } catch (err) { 
-        console.log(err);
-        operationResult =  {
+    if (hasPermission(data["editor_info"])) {
+        try {
+            operationResult = editUser(data["id"], data);
+        } catch (err) { 
+            console.log(err);
+            operationResult =  {
+                success: false,
+                message: "Something went wrong with the editing user operation."
+            };
+        }
+    }else{
+        operationResult = {
             success: false,
-            message: "Something went wrong with the editing user operation."
-        };
+            message: "Editor info is invalid or doesn't have correct permissions."
+        }
     }
     response.end(JSON.stringify(operationResult));
 });
@@ -485,9 +554,13 @@ function addModule(module_obj){
     if (search == null) {
         module_obj["isBeingListened"] = false;
         modules.push(module_obj);
-        notify(true, "Added " + module_obj["name"] + " to the blacklist.", [module_obj]);
+        var msg = "Added " + module_obj["name"] + " to the blacklist.";
+        notify(true, msg, [module_obj]);
+        log_new_entry(get_this_server_info(), "module", msg, [module_obj]);
         return true;
     }else{
+        var msg = "Attempted to add module " + module_obj["name"] + " to the server, but " + module_obj["id"] + " already exists.";
+        log_new_entry(get_this_server_info(), "module", msg, [module_obj]);
         return false;
     }
 }
@@ -513,14 +586,18 @@ app.post('/module/add', urlencodedParser, function(request,response){
     response.end(JSON.stringify(result));
 });
 
-function removeModule(id){
+function removeModule(id, editor_info){
     var desired_module = findIn(modules, 'id',id);
     if(desired_module != null){
         var name = desired_module.info["name"];
         modules.splice(desired_module["index"], 1);
-        notify(true, "Deleted " + name + " from the server.", [desired_module.info]);
+        var msg = "Deleted " + name + " from the server.";
+        notify(true, msg, [desired_module.info]);
+        log_new_entry(editor_info, "module", msg, [desired_module.info]);
         return true;
     }else{
+        var msg = "Can't delete module ID " + id + " from the server because it wasn't found";
+        log_new_entry(editor_info, "module", msg, [{type:"module",id:id}]);
         return false;
     }
 
@@ -533,12 +610,16 @@ app.delete('/module/remove', urlencodedParser, function(request,response){
         message: ""
     };
 
-    result.success = removeModule(data["id"]);
+    if (hasPermission(data["editor_info"])) {
+        result.success = removeModule(data["id"], data["editor_info"]);
 
-    if(result.success){
-        result.message = "Removed Module with ID " + data["id"] + " from the server.";
+        if(result.success){
+            result.message = "Removed Module with ID " + data["id"] + " from the server.";
+        }else{
+            result.message = "Module ID " + data["id"] + " not found on the server.";
+        }
     }else{
-        result.message = "Module ID " + data["id"] + " not found on the server.";
+        result.message = "Editor info is invalid or doesn't have correct permissions.";
     }
     response.end(JSON.stringify(result));
 });
@@ -555,12 +636,12 @@ function editModule(id, newData){
     var searchResult = findIn(modules,'id',id);
     if(searchResult == null){
         response.message = "Module ID " + id + " not found on the server.";
+        log_new_entry(newData["editor_info"], "module", response.message, [newData]);
         return response;
     }   
 
     var found_module = searchResult.info;
 
-    //change data
     //change data
     for (f in newData) {
         if (editableFields.indexOf(f) > -1 && found_module[f] != null &&
@@ -591,6 +672,7 @@ function editModule(id, newData){
             response.message = "One or more values were invalid.";
         }
     }
+    log_new_entry(newData["editor_info"], "module", response.message, [newData]);
     modules[searchResult.index] = found_module;
     return response;    
 }
@@ -598,14 +680,21 @@ function editModule(id, newData){
 app.post('/module/edit', urlencodedParser, function(request,response){
     var data = JSON.parse(request.body.data);
     var operationResult = {};
-    try{
-        operationResult = editModule(data["id"],data);
-    }catch(err){
-        console.log(err);
+    if (hasPermission(data["editor_info"])) {
+        try{
+            operationResult = editModule(data["id"],data);
+        }catch(err){
+            console.log(err);
+            operationResult = {
+                success: false,
+                message: "Something went wrong with the editing module operation."
+            };
+        }
+    }else{
         operationResult = {
             success: false,
-            message: "Something went wrong with the editing module operation."
-        };
+            message: "Editor info is invalid or doesn't have correct permissions."
+        }
     }
     response.end(JSON.stringify(operationResult));
 });
@@ -639,9 +728,11 @@ app.post('/module/log', urlencodedParser, function(request,response){
         success: false,
         message: ""
     }
+    //todo: check to see if module is on blacklist before accepting
     result.success = isValidLog(data);
     if(result.success){
         logs.push(data);
+        notify(true,data["message"],data["data"]);
         // console.log(logs);
         result.message = "Successfully logged message."
     }else{
@@ -661,7 +752,6 @@ function get_logs(startDate,endDate){
 }
 
 app.post('/logs', urlencodedParser, function(request,response){
-    // console.log("entered module/logs")
     var data = JSON.parse(request.body.data);
     try {
         //only allow users already in the server to query log data
@@ -712,5 +802,5 @@ var server = app.listen(argv["port"], argv["ip"], function(){
     if(argv["demo"])
         demo_setup();
 
-    console.log("Server listening at http://%s", get_this_server_id());  
+    console.log("Server listening at http://%s", get_this_server_info()["id"]);  
 });
