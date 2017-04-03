@@ -9,8 +9,8 @@ var request = require('request');
 var sampleModule = 
 	{
 		editor_info: {
-			id: "s0m3us3r",
-			type: "guardian"
+			id: "12345abcde",
+			type: "user"
 		},
 		isBeingListened: false,
 		mainServerID: "123.456.789:8080",
@@ -24,8 +24,8 @@ var sampleModule =
 var sampleUser = 
 	{
 		editor_info:{
-			id: "s0m3us3r",
-			type: "guardian"
+			id: "12345abcde",
+			type: "user"
 		},
 		name:"john doe",
 		id:"s0m3us3r",
