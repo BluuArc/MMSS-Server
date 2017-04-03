@@ -22,74 +22,100 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Adding a Module
 * **Method Tested:** `/module/add`
-* **Input:** Accesssed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
+* **Input:** Accesssed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it. The editor info is not required when adding a module, as it would be added to the server's blacklist automatically as soon as it's detected.
 ``` 
 {
-    "isBeingListened":true,
-    "mainServerID":"123.456.789:8080",
-    "name":"front door sensor",
-    "parameterData":[0],
-    "id":"12345abcde",
-    "type":"sensormodule"
+    "editor_info": {
+        "id": "12345abcde",
+        "type": "user"
+    },
+    "isBeingListened": false,
+    "mainServerID": "123.456.789:8080",
+    "name": "front door sensor",
+    "parameterData": [0],
+    "id": "s0m3m0dul3",
+    "type": "sensormodule"
 }
  ```
-* **Output:** Success or failure message (JSON) based on the success or failure of adding a module to the list. Default return value for valid input is shown below.
+* **Output:** Success or failure message (JSON) based on the success or failure of adding a module to the list. A sample return value for valid input is shown below.
 ```
 {
-    "success":true,
-    "message":"Successfully added 'front door sensor (12345abcde)' to the server"
+    "success": true,
+    "message": "Added front door sensor to the blacklist."
 }
 ```
-* **Intended Action:** Add a module to the current list of modules to listen to on the server.
+* **Intended Action:** Add a module to the current list of blacklisted modules on the server.
 
 ## Removing a Module
 * **Method Tested:** `/module/remove`
-* **Input:** Accessed via the DELETE protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module.
+* **Input:** Accessed via the DELETE protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and editor info.
 ``` 
 {
-    "id":"abcde12345"
+    "editor_info": {
+        "id": "12345abcde",
+        "type": "user"
+    },
+    "isBeingListened": false,
+    "mainServerID": "123.456.789:8080",
+    "name": "front door sensor",
+    "parameterData": [0],
+    "id": "s0m3m0dul3",
+    "type": "sensormodule"
 }
  ```
-* **Output:** Success or failure message (JSON) based on the success or failure of removing a module to the list. Default return value for valid input is shown below.
+* **Output:** Success or failure message (JSON) based on the success or failure of removing a module to the list. A sample return value for valid input is shown below.
 ```
 {
-    "success":false,
-    "message":"Failed to remove module with ID 'abcde12345' because it doesn't exist in the list."
+    "success": true,
+    "message": "Removed Module with ID s0m3m0dul3 from the server."
 }
 ```
-* **Intended Action:** The method should remove the module from the list of modules to listen to on the server.
+* **Intended Action:** The method should remove the module from the list of modules on the server.
 
 ## Editing a Module
 * **Method Tested:** `/module/edit`
-* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and any changed data. A message field is necessary if a message is to be passed as well.
+* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module and any changed data. The only editable fields are the isBeingListened field and the name fields.
 ``` 
 {
-    "id":"abcde12345",
-    "isBeingListened":true
+    "editor_info": {
+        "id": "12345abcde",
+        "type": "user"
+    },
+    "isBeingListened": true,
+    "mainServerID": "123.456.789:8080",
+    "name": "the sensor of the front door",
+    "parameterData": [0],
+    "id": "s0m3m0dul3",
+    "type": "sensormodule"
 }
 ```
-* **Output:** Success or failure message (JSON) based on the success or failure of editing a module to the list. Default return value for valid input is shown below.
+* **Output:** Success or failure message (JSON) based on the success or failure of editing a module to the list. A sample return value for valid input is shown below.
 ```
 {
-    "success":true,
-    "message":"Changed module with ID 'abcde12345'. It is now being listened to"
+    "success": true,
+    "message": "Module s0m3m0dul3 is now on the whitelist. Changed name of s0m3m0dul3 to be 'the sensor of the front door'. "
 }
 ```
 * **Intended Action:** The method should edit some parameters of a module based on an input string.
 
 ## Sending a Module Notification
 * **Method Tested:** `/module/log`
-* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of module, the parameterList, the message, the module type, and the time of the message in the following format: yyyy-mm-dd hh:mm:ss
+* **Input:** Accessed via the POST protocol. JSON string of a module based on the [PassableLog](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. The time of the message must be in the following format: yyyy-mm-dd hh:mm:ss.
 ``` 
 {
-    "id":"abcde12345",
-    "parameterData":[0],
-    "message": "Front door sensor was triggered",
-    "time": "2017-03-26 15:53:32",
-    "type": "sensormodule"
+    "author_info": {
+        "id": "s0m3m0dul3",
+        "type": "module"
+    },
+    "data": [
+        1
+    ],
+    "time": "2017-03-29 12:00:00",
+    "message": "Front door sensor was triggered.",
+    "subject_type": "module"
 }
 ```
-* **Output:** Success or failure message (JSON) based on the success or failure of logging the message. Default return value for valid input is shown below.
+* **Output:** Success or failure message (JSON) based on the success or failure of logging the message. A sample return value for valid input is shown below.
 ```
 {
     "success":true,
@@ -101,38 +127,78 @@ This is a place where I keep track of the test cases used in this project.
 ## Listing All Modules
 * **Method Tested:** `/module/list`
 * **Input:** Simple connection to the `/module/list` URL via the GET protocol.
-* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
+* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
 [
     {
-        "isBeingListened":true,
-        "mainServerID":"123.456.789:8080",
-        "name":"front door sensor",
-        "parameterData":[0],
-        "id":"12345abcde",
-        "type":"sensormodule"
+        "editor_info": {
+            "id": "4dminu53r",
+            "type": "user"
+        },
+        "name": "front door sensor",
+        "type": "sensormodule",
+        "id": "12345abcde",
+        "mainServerID": "127.0.0.1:8081",
+        "parameterData": [
+            0
+        ],
+        "isBeingListened": false
+    },
+    {
+        "editor_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "mainServerID": "127.0.0.1:8081",
+        "name": "front door lights",
+        "parameterData": [
+            1
+        ],
+        "id": "67890fghij",
+        "type": "interactivemodule",
+        "isBeingListened": true
+    },
+    {
+        "editor_info": {
+            "id": "12345abcde",
+            "type": "user"
+        },
+        "isBeingListened": false,
+        "mainServerID": "127.0.0.1:8081",
+        "name": "front door sensor",
+        "parameterData": [
+            0
+        ],
+        "id": "s0m3m0dul3",
+        "type": "sensormodule"
     }
 ]
  ```
-* **Intended Action:** The method should list all the modules in all lists on the server.
+* **Intended Action:** The method should list all the modules on the server.
 
 ## Listing All Blacklisted Modules
 * **Method Tested:** `/module/list/blacklist`
 * **Input:** Simple connection to the `/module/list/blacklist` URL via the GET protocol.
-* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
+* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
 [
     {
-        "isBeingListened":false,
-        "mainServerID":"123.456.789:8080",
-        "name":"rear door sensor",
-        "parameterData":[0],
-        "id":"67890fghij",
-        "type":"sensormodule"
+        "editor_info": {
+            "id": "4dminu53r",
+            "type": "user"
+        },
+        "name": "front door sensor",
+        "type": "sensormodule",
+        "id": "12345abcde",
+        "mainServerID": "127.0.0.1:8081",
+        "parameterData": [
+            0
+        ],
+        "isBeingListened": false
     }
 ]
  ```
-* **Intended Action:** The method should list all the blacklisted modules, if any exist.
+* **Intended Action:** The method should list all the blacklisted modules (i.e. where isBeingListened = false), if any exist.
 
 ## Listing All Blacklisted Modules of a Specific Type
 * **Method Tested:** `/module/list/blacklist/<type>`
@@ -141,12 +207,18 @@ This is a place where I keep track of the test cases used in this project.
 ``` 
 [
     {
-        "isBeingListened":false,
-        "mainServerID":"123.456.789:8080",
-        "name":"rear door sensor",
-        "parameterData":[0],
-        "id":"67890fghij",
-        "type":"sensormodule"
+        "editor_info": {
+            "id": "4dminu53r",
+            "type": "user"
+        },
+        "name": "front door sensor",
+        "type": "sensormodule",
+        "id": "12345abcde",
+        "mainServerID": "127.0.0.1:8081",
+        "parameterData": [
+            0
+        ],
+        "isBeingListened": false
     }
 ]
  ```
@@ -159,12 +231,32 @@ This is a place where I keep track of the test cases used in this project.
 ``` 
 [
     {
-        "isBeingListened":true,
-        "mainServerID":"123.456.789:8080",
-        "name":"front door sensor",
-        "parameterData":[0],
-        "id":"12345abcde",
-        "type":"sensormodule"
+        "editor_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "mainServerID": "127.0.0.1:8081",
+        "name": "front door lights",
+        "parameterData": [
+            1
+        ],
+        "id": "67890fghij",
+        "type": "interactivemodule",
+        "isBeingListened": true
+    },
+    {
+        "editor_info": {
+            "id": "12345abcde",
+            "type": "user"
+        },
+        "isBeingListened": true,
+        "mainServerID": "127.0.0.1:8081",
+        "name": "the sensor of the front door",
+        "parameterData": [
+            0
+        ],
+        "id": "s0m3m0dul3",
+        "type": "sensormodule"
     }
 ]
 ```
@@ -172,17 +264,23 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Listing All Whitelisted Modules of a Specific Type
 * **Method Tested:** `/module/list/whitelist/<type>`
-* **Input:** Simple connection to the `/module/list/whitelist/<type>` URL via the GET protocol. For example, this test will use `/module/list/whitelist/sensormodule`.
-* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no modules are available.
+* **Input:** Simple connection to the `/module/list/whitelist/<type>` URL via the GET protocol. For example, this test will use `/module/list/whitelist/interactivemodule`.
+* **Output:** JSON string with array of modules, with the format of each module being based on the [PassableModule](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no modules are available.
 ``` 
 [
     {
-        "isBeingListened":true,
-        "mainServerID":"123.456.789:8080",
-        "name":"front door sensor",
-        "parameterData":[0],
-        "id":"12345abcde",
-        "type":"sensormodule"
+        "editor_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "mainServerID": "127.0.0.1:8081",
+        "name": "front door lights",
+        "parameterData": [
+            1
+        ],
+        "id": "67890fghij",
+        "type": "interactivemodule",
+        "isBeingListened": true
     }
 ]
 ```
@@ -193,55 +291,78 @@ This is a place where I keep track of the test cases used in this project.
 * **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Specific ordering of the data isn't required as long as all the required data is in it.
 ``` 
 {
-    "isBeingListened":false,
-    "name":"john doe",
-    "id":"12345abcde",
-    "type":"guardian",
-    "logs":[],
-    "notifications":[]
+    "editor_info": {
+        "id": "12345abcde",
+        "type": "user"
+    },
+    "name": "john doe",
+    "id": "s0m3us3r",
+    "type": "guardian",
+    "logs": [],
+    "notifications": [],
+    "isBeingListened": false,
+    "last_update_time": "2017-03-25 12:34:56"
 }
  ```
-* **Output:** Success or failure message (JSON) based on the success or failure of adding a user to the list. Default return value for valid input is shown below.
+* **Output:** Success or failure message (JSON) based on the success or failure of adding a user to the list. A sample return value for valid input is shown below.
 ```
 {
-    "success":true,
-    "message":"Successfully added 'john doe' (12345abcde) to the server"  
+    "success": true,
+    "message": "Added john doe to the blacklist."
 }
 ```
 * **Intended Action:** Add a user to the current list of users to listen to on the server.
 
 ## Removing a User
 * **Method Tested:** `/user/remove`
-* **Input:** Accessed via the DELETE protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user.
+* **Input:** Accessed via the DELETE protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and editor info.
 ``` 
 {
-    "id":"abcde12345"
+    "editor_info": {
+        "id": "12345abcde",
+        "type": "user"
+    },
+    "name": "john doe",
+    "id": "s0m3us3r",
+    "type": "guardian",
+    "logs": [],
+    "notifications": [],
+    "isBeingListened": false,
+    "last_update_time": "2017-03-25 12:34:56"
 }
  ```
-* **Output:** Success or failure message (JSON) based on the success or failure of removing a user to the list. Default return value for valid input is shown below.
+* **Output:** Success or failure message (JSON) based on the success or failure of removing a user to the list. A sample return value for valid input is shown below.
 ```
 {
-    "success":false,
-    "message":"Failed to remove user with ID 'abcde12345' because it doesn't exist in the list."
+    "success": true,
+    "message": "Removed User ID s0m3us3r from the server."
 }
 ```
 * **Intended Action:** The method should remove the user from the list of users to listen to on the server.
 
 ## Editing a User
 * **Method Tested:** `/user/edit`
-* **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and any changed data.
+* **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user, editor info, and any changed data. The only editable fields are name, type, and isBeingListened
 ``` 
 {
-    "id":"abcde12345",
-    "name":"john doe ii",
-    "isBeingListened":true
+    "editor_info": {
+        "id": "12345abcde",
+        "type": "user"
+    },
+    "name": "A brand new name",
+    "id": "s0m3us3r",
+    "type": "dependent",
+    "logs": [],
+    "notifications": [],
+    "isBeingListened": true,
+    "last_update_time": "2017-03-25 12:34:56"
 }
  ```
-* **Output:** Success or failure message (JSON) based on the success or failure of removing a user to the list. Default return value for valid input is shown below.
+* **Output:** Success or failure message (JSON) based on the success or failure of removing a user to the list. A sample return value for valid input is shown below.
 ```
 {
-    "success":true,
-    "message":"Changed user with ID 'abcde12345'. It is now being listened to. It is now named 'john doe ii'."
+    "success": true,
+    "message": "Changed name of s0m3us3r to be 'A brand new name'. Changed the type of s0m3us3r to be dependent. User s0m3us3r is now on the whitelist. "
 }
 ```
 * **Intended Action:** The method should edit some parameters of a user based on an input string.
@@ -249,16 +370,47 @@ This is a place where I keep track of the test cases used in this project.
 ## Listing All Users
 * **Method Tested:** `/user/list`
 * **Input:** Simple connection to the `/user/list` URL via the GET protocol.
-* **Output:** JSON string with array of users, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+* **Output:** JSON string with array of users, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
     {
-        "isBeingListened":true,
-        "name":"john doe",
-        "id":"12345abcde",
-        "type":"guardian",
-        "logs":[],
-        "notifications":[]
+        "editor_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "name": "john doe",
+        "id": "12345abcde",
+        "type": "guardian",
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": true,
+        "last_update_time": "2017-04-03 07:22:25"
+    },
+    {
+        "editor_info": {
+            "id": "4dminu53r",
+            "type": "user"
+        },
+        "name": "billy bob",
+        "id": "67890fghij",
+        "type": "dependent",
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": false,
+        "last_update_time": "2017-03-20 12:34:56"
+    },
+    {
+        "editor_info": {
+            "id": "12345abcde",
+            "type": "user"
+        },
+        "name": "A brand new name",
+        "id": "s0m3us3r",
+        "type": "dependent",
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": true,
+        "last_update_time": "2017-03-25 12:34:56"
     }
 ]
  ```
@@ -267,20 +419,21 @@ This is a place where I keep track of the test cases used in this project.
 ## Listing All Blacklisted Users
 * **Method Tested:** `/user/list/blacklist`
 * **Input:** Simple connection to the `/user/list/blacklist` URL via the GET protocol.
-* **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+* **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
     {
-        "isBeingListened": false,
+        "editor_info": {
+            "id": "4dminu53r",
+            "type": "user"
+        },
         "name": "billy bob",
         "id": "67890fghij",
         "type": "dependent",
-        "logs": [
-            "log 1"
-        ],
-        "notifications": [
-            "note 1"
-        ]
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": false,
+        "last_update_time": "2017-03-20 12:34:56"
     }
 ]
  ```
@@ -288,20 +441,21 @@ This is a place where I keep track of the test cases used in this project.
 ## Listing All Blacklisted Users of a Specific Type
 * **Method Tested:** `/user/list/blacklist/<type>`
 * **Input:** Simple connection to the `/user/list/blacklist/<type>` URL via the GET protocol. For example, this test will use `/user/list/blacklist/dependent`.
-* **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+* **Output:** JSON string with array of users on the blacklist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
     {
-        "isBeingListened": false,
+        "editor_info": {
+            "id": "4dminu53r",
+            "type": "user"
+        },
         "name": "billy bob",
         "id": "67890fghij",
         "type": "dependent",
-        "logs": [
-            "log 1"
-        ],
-        "notifications": [
-            "note 1"
-        ]
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": false,
+        "last_update_time": "2017-03-20 12:34:56"
     }
 ]
  ```
@@ -309,16 +463,34 @@ This is a place where I keep track of the test cases used in this project.
 ## Listing All Whitelisted Users
 * **Method Tested:** `/user/list/whitelist`
 * **Input:** Simple connection to the `/user/list/whitelist` URL via the GET protocol.
-* **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+* **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
     {
-        "isBeingListened":true,
-        "name":"john doe",
-        "id":"12345abcde",
-        "type":"guardian",
-        "logs":[],
-        "notifications":[]
+        "editor_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "name": "john doe",
+        "id": "12345abcde",
+        "type": "guardian",
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": true,
+        "last_update_time": "2017-04-03 07:22:25"
+    },
+    {
+        "editor_info": {
+            "id": "12345abcde",
+            "type": "user"
+        },
+        "name": "A brand new name",
+        "id": "s0m3us3r",
+        "type": "dependent",
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": true,
+        "last_update_time": "2017-03-25 12:34:56"
     }
 ]
  ```
@@ -326,16 +498,21 @@ This is a place where I keep track of the test cases used in this project.
  ## Listing All Whitelisted Users of a Specific Type
 * **Method Tested:** `/user/list/whitelist/<type>`
 * **Input:** Simple connection to the `/user/list/whitelist/<type>` URL via the GET protocol. For example, this test will use `/user/list/whitelist/guardian`.
-* **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below. Array will be empty if no users are available.
+* **Output:** JSON string with array of users on the whitelist, with the format of each user being based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no users are available.
 ``` 
 [
     {
-        "isBeingListened":true,
-        "name":"john doe",
-        "id":"12345abcde",
-        "type":"guardian",
-        "logs":[],
-        "notifications":[]
+        "editor_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "name": "john doe",
+        "id": "12345abcde",
+        "type": "guardian",
+        "logs": [],
+        "notifications": [],
+        "isBeingListened": true,
+        "last_update_time": "2017-04-03 07:22:25"
     }
 ]
  ```
@@ -344,25 +521,106 @@ This is a place where I keep track of the test cases used in this project.
 
 ## Requesting Logs
 * **Method Tested:** `/logs`
-* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user, a start date, and an end date.
+* **Input:** Accessed via the GET protocol. JSON string of a user based on the [PassableLogRequest](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user, a start date, and an end date.
 ``` 
 {
-    "id": "abcde12345",
+    "id": "12345abcde",
     "start_time": "2017-03-01 00:00:00",
-    "end_time": "2017-03-30 10:58:42"
+    "end_time": "2017-04-03 07:51:14"
 }
  ```
-* **Output:** JSON string of with array of log objects based on the [PassableLog](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below.
+* **Output:** JSON string of with array of log objects based on the [PassableLog](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below. Array will be empty if no logs are available.
 ``` 
 [
     {
-        "id": "s0m3m0dul3",
-        "parameterData": [
-            1
-        ],
-        "time": "2017-03-29 12:00:00",
-        "message": "Front door sensor was triggered.",
-        "type": "module"
+        "author_info": {
+            "id": "127.0.0.1:8081",
+            "type": "server"
+        },
+        "message": "Added john doe to the blacklist.",
+        "time": "2017-04-03 07:51:11",
+        "subject_type": "user",
+        "data": [
+            {
+                "type": "user",
+                "id": "12345abcde"
+            }
+        ]
+    },
+    {
+        "author_info": {
+            "id": "127.0.0.1:8081",
+            "type": "server"
+        },
+        "message": "Added billy bob to the blacklist.",
+        "time": "2017-04-03 07:51:11",
+        "subject_type": "user",
+        "data": [
+            {
+                "type": "user",
+                "id": "67890fghij"
+            }
+        ]
+    },
+    {
+        "author_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "message": "No changed values were detected.",
+        "time": "2017-04-03 07:51:11",
+        "subject_type": "user",
+        "data": [
+            {
+                "type": "user",
+                "id": "12345abcde"
+            }
+        ]
+    },
+    {
+        "author_info": {
+            "id": "127.0.0.1:8081",
+            "type": "server"
+        },
+        "message": "Added front door sensor to the blacklist.",
+        "time": "2017-04-03 07:51:11",
+        "subject_type": "module",
+        "data": [
+            {
+                "type": "module",
+                "id": "12345abcde"
+            }
+        ]
+    },
+    {
+        "author_info": {
+            "id": "127.0.0.1:8081",
+            "type": "server"
+        },
+        "message": "Added front door lights to the blacklist.",
+        "time": "2017-04-03 07:51:11",
+        "subject_type": "module",
+        "data": [
+            {
+                "type": "module",
+                "id": "67890fghij"
+            }
+        ]
+    },
+    {
+        "author_info": {
+            "id": "l33tgu4rd1an",
+            "type": "user"
+        },
+        "message": "Module 67890fghij is now on the whitelist. ",
+        "time": "2017-04-03 07:51:11",
+        "subject_type": "module",
+        "data": [
+            {
+                "type": "module",
+                "id": "67890fghij"
+            }
+        ]
     }
 ]
  ```
@@ -373,28 +631,17 @@ This is a place where I keep track of the test cases used in this project.
 * **Input:** Accessed via the POST protocol. JSON string of a user based on the [PassableUser](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Minimum needed is ID of user and the time of the last notification.
 ``` 
 {
-    "id":"abcde12345"
-    "last_update_time": "< last_notification_time > (type / format?)"
+    "id":"12345abcde"
+    "last_update_time": "2017-03-01 00:00:00"
 }
  ```
-* **Output:** JSON string of the requested user with the format being based on the [PassableNotification](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. Default return value for valid input is shown below.
+* **Output:** JSON string of the requested user with the format being based on the [PassableNotification](https://github.com/Walden1995/MMSS/tree/master/api/Passable) API. A sample return value for valid input is shown below.
 ```
 [
     {
         "success": true,
-        "message": "Added billy bob to the blacklist.",
-        "time": "2017-03-30 08:58:36",
-        "data": [
-            {
-                "type": "user",
-                "id": "67890fghij"
-            }
-        ]
-    },
-    {
-        "success": true,
         "message": "Added john doe to the blacklist.",
-        "time": "2017-03-30 08:58:36",
+        "time": "2017-04-03 07:04:24",
         "data": [
             {
                 "type": "user",
@@ -404,8 +651,19 @@ This is a place where I keep track of the test cases used in this project.
     },
     {
         "success": true,
+        "message": "Added billy bob to the blacklist.",
+        "time": "2017-04-03 07:04:24",
+        "data": [
+            {
+                "type": "user",
+                "id": "67890fghij"
+            }
+        ]
+    },
+    {
+        "success": true,
         "message": "Added front door sensor to the blacklist.",
-        "time": "2017-03-30 08:58:36",
+        "time": "2017-04-03 07:04:24",
         "data": [
             {
                 "type": "module",
@@ -416,11 +674,98 @@ This is a place where I keep track of the test cases used in this project.
     {
         "success": true,
         "message": "Added front door lights to the blacklist.",
-        "time": "2017-03-30 08:58:36",
+        "time": "2017-04-03 07:04:24",
         "data": [
             {
                 "type": "module",
                 "id": "67890fghij"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Module 67890fghij is now on the whitelist. ",
+        "time": "2017-04-03 07:04:24",
+        "data": [
+            {
+                "type": "module",
+                "id": "67890fghij"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Added front door sensor to the blacklist.",
+        "time": "2017-04-03 07:05:05",
+        "data": [
+            {
+                "type": "module",
+                "id": "s0m3m0dul3"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Module s0m3m0dul3 is now on the whitelist. Changed name of s0m3m0dul3 to be 'the sensor of the front door'. ",
+        "time": "2017-04-03 07:05:50",
+        "data": [
+            {
+                "type": "module",
+                "id": "s0m3m0dul3"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Deleted the sensor of the front door from the server.",
+        "time": "2017-04-03 07:06:02",
+        "data": [
+            {
+                "type": "module",
+                "id": "s0m3m0dul3"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Added john doe to the blacklist.",
+        "time": "2017-04-03 07:06:42",
+        "data": [
+            {
+                "type": "user",
+                "id": "s0m3us3r"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Changed name of s0m3us3r to be 'A brand new name'. Changed the type of s0m3us3r to be dependent. User s0m3us3r is now on the whitelist. ",
+        "time": "2017-04-03 07:06:45",
+        "data": [
+            {
+                "type": "user",
+                "id": "s0m3us3r"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Deleted A brand new name from the server.",
+        "time": "2017-04-03 07:07:03",
+        "data": [
+            {
+                "type": "user",
+                "id": "s0m3us3r"
+            }
+        ]
+    },
+    {
+        "success": true,
+        "message": "Front door sensor was triggered.",
+        "time": "2017-04-03 07:07:43",
+        "data": [
+            {
+                "type": "none"
             }
         ]
     }
