@@ -549,6 +549,7 @@ function isModule(json_obj){
         json_obj.type.toLowerCase().search("module") > -1);
 }
 
+//todo: delete editor_info field?
 function addModule(module_obj){
     var search = findIn(modules, 'id', module_obj["id"]);
     if (search == null) {
