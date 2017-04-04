@@ -71,9 +71,13 @@ io.on('connection', function (socket) {
         console.log("Received " + id);
         var path = '/user/id/' + id;
         get_server_response(path,'GET',function(fullResponse){
-            var result = JSON.parse(fullResponse);
-            io.emit('user found', JSON.stringify(result));
-            console.log("Emitted " + JSON.stringify(result));
+            try{
+                var result = JSON.parse(fullResponse);
+                io.emit('user found', JSON.stringify(result));
+                console.log("Emitted " + JSON.stringify(result));
+            }catch(err){
+                console.log(err);
+            }
         })
     })
 
@@ -81,9 +85,13 @@ io.on('connection', function (socket) {
         console.log("Received " + id);
         var path = '/module/id/' + id;
         get_server_response(path, 'GET', function (fullResponse) {
-            var result = JSON.parse(fullResponse);
-            io.emit('module found', JSON.stringify(result));
-            console.log("Emitted " + JSON.stringify(result));
+            try{
+                var result = JSON.parse(fullResponse);
+                io.emit('module found', JSON.stringify(result));
+                console.log("Emitted " + JSON.stringify(result));
+            }catch(err){
+                console.log(err);
+            }
         })
     })
 });
@@ -324,12 +332,19 @@ app.get('/module/edit', function (req, res) {
 
 app.get('/module/edit/options', function (req, res) {
     // console.log(req);
+    var parameterData;
+    try{
+        parameterData = JSON.parse(req.query.parameterData);
+    }catch(err){
+        console.log(err);
+        parameterData = [];
+    }
     var editedModule = {
         editor_info: editor_info,
         name: req.query.name,
         id: req.query.id_user,
         type: req.query.type,
-        parameterData: JSON.parse(req.query.parameterData),
+        parameterData: parameterData,
         isBeingListened: (req.query.isWhitelisted == 'true') ? true : false,
         last_update_time: get_formatted_date(new Date())
     };
