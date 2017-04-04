@@ -38,12 +38,16 @@ io.on('connection', function (socket) {
         console.log('A user disconnected');
     });
 
-    socket.on('info update', function (name, ip) {
+    socket.on('info update', function (name, ip, use_https) {
         console.log("Received " + name + " and " + ip);
         editor_info["name"] = name,
         server_ip = ip;
         serverRequestOptions["host"] = ip.split(':')[0];
         serverRequestOptions["port"] = ip.split(':')[1];
+        if (serverRequestOptions["port"] == ""){
+            delete serverRequestOptions["port"];
+        }
+        serverRequestOptions["use_https"] = use_https;
 
         var clientUser = {
             name: editor_info["name"],
