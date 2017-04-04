@@ -9,17 +9,16 @@ This is a sample web client for the alpha demo of the MMSS. Shown below are samp
 ### User
 * [Add](/user/add)
 * [Edit](/user/edit)
-* [Remove](/user/remove)
+* Remove - Front End not implemented
 * [List](/user/list)
 
 ### Module
 * [Add](/module/add)
 * [Edit](/module/edit)
-* [Remove](/module/remove)
+* Remove - Front End not implemented
 * [List](/module/list)
-* [Create Log](/module/log)
+* Create Log - Front End not implemented
 
 ### General
-* [List Notifications](/notifications)
-* [List Logs](/logs)
-* [Show Live Feed of Logs and Notfications (works only in debug mode)](/live)
+* List Notifications - Front End not implemented
+* List Logs - Front End not implemented
