@@ -636,8 +636,14 @@ app.get('/module/list/blacklist/:type', function (request, response) {
 
 //TODO: get better way of searching
 function isModule(json_obj){
-    return (json_obj.type != undefined &&
+    var isValid = (json_obj.type != undefined &&
         json_obj.type.toLowerCase().search("module") > -1);
+
+    if (json_obj["name"] != undefined) {
+        isValid = isValid && json_obj.name.length > 0;
+    }
+    isValid = isValid && json_obj.id != undefined && json_obj.id.length > 0;
+    return isValid;
 }
 
 //todo: delete editor_info field?
