@@ -300,6 +300,26 @@ app.get('/save', function(request,response){
     response.end(JSON.stringify(msg));
 });
 
+//find user by ID
+//TODO: Add permission checking?
+app.get('/user/id/:id', function(request,response){
+    var user = findIn(users,'id',request.params.id);
+    if(user != null){
+        response.send(JSON.stringify(user.info));
+    }else{
+        var emptyUser = {
+            name: "not found",
+            id: "not found",
+            type: "not found",
+            logs: [],
+            notifications: [],
+            isBeingListened: false,
+            last_update_time: "1970-01-01 00:00:00"
+        }
+        response.send(JSON.stringify(emptyUser));
+    }
+})
+
 app.get('/user/list', function (request, response) {
     response.end(JSON.stringify(users));
 });
@@ -343,6 +363,7 @@ function isValidUser(json_obj) {
     if(json_obj["name"] != undefined){
         isValid = isValid &&json_obj.name.length > 0;
     }
+    isValid = isValid && json_obj.id != undefined && json_obj.id.length > 0;
     return isValid;
 }
 
@@ -362,14 +383,16 @@ function findIn(array, fieldName, fieldData){
 function addUser(user_obj) {
     var search = findIn(users,'id', user_obj["id"]);
     if(search == null){
+        var isBeingListened = false;
         user_obj["isBeingListened"] = false; //add to blacklist
         users.push(user_obj);
         if (users.length == 1) {//if new user is the first user, automatically elevate their permissions
             users[0]["isBeingListened"] = true;
             users[0]["type"] = "guardian";
+            isBeingListened = true;
         }
 
-        var msg = "Added " + user_obj["name"] + " to the blacklist.";
+        var msg = "Added " + user_obj["name"] + " to the " + (isBeingListened ? " whitelist." : " blacklist.");
         notify(true, msg, [user_obj]);
         log_new_entry(get_this_server_info(),"user",msg,[user_obj]);
         return true;
@@ -546,6 +569,25 @@ app.post('/user/edit', urlencodedParser, function(request,response){
 });
 
 
+//find module by ID
+//TODO: Add permission checking?
+app.get('/module/id/:id', function (request, response) {
+    var myModule = findIn(modules, 'id', request.params.id);
+    if (myModule != null) {
+        response.send(JSON.stringify(myModule.info));
+    } else {
+        var emptyModule = {
+            name: "not found",
+            id: "not found",
+            type: "not found",
+            mainServerID: "not found",
+            parameterData: ["not found"],
+            isBeingListened: false,
+            last_update_time: "1970-01-01 00:00:00"
+        }
+        response.send(JSON.stringify(emptyModule));
+    }
+})
 
 app.get('/module/list', function(request,response){
     response.end(JSON.stringify(modules));
