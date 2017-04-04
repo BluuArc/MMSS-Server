@@ -59,6 +59,18 @@ app.use(urlencodedParser);
 app.use(bodyParser.json({ limit: '200mb' }));
 app.use(express.static('frontend'));
 
+//source: http://stackoverflow.com/questions/7067966/how-to-allow-cors
+//CORS middleware, required for cross-domain reqeusting
+var allowCrossDomain = function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,POST');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+}
+app.use(allowCrossDomain);
+
+
 var server_info = null;
 function get_this_server_info() {
     if(server_info == null){
