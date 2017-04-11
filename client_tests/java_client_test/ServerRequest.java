@@ -73,16 +73,18 @@ public class ServerRequest{
         if (urlInput.indexOf("https") == 0) {
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
             connection.setDoOutput(true);
+            connection.getOutputStream().write(postDataBytes);
             serverResponse = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
         } else {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
             connection.setDoOutput(true);
+            connection.getOutputStream().write(postDataBytes);
             serverResponse = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
         }
 
@@ -107,16 +109,18 @@ public class ServerRequest{
         if (urlInput.indexOf("https") == 0) {
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("DELETE");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
             connection.setDoOutput(true);
+            connection.getOutputStream().write(postDataBytes);
             serverResponse = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
         } else {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("DELETE");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
             connection.setDoOutput(true);
+            connection.getOutputStream().write(postDataBytes);
             serverResponse = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
         }
 
