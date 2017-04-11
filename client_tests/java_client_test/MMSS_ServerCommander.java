@@ -94,4 +94,31 @@ public class MMSS_ServerCommander extends ServerRequest{
         Map<String,Object> postData = createPostData(moduleToDelete.toJSON());
         return getDeleteResponse("/module/remove", postData);
     }
+
+    public PassableResponse addModuleLog(PassableLog log) throws Exception{
+        Map<String,Object> postData = createPostData(log.toJSON());
+        return getPostResponse("/module/log", postData);
+    }
+
+    public PassableLog[] getLogs(PassableLogRequest request)throws Exception{
+        Map<String,Object> postData = createPostData(request.toJSON());
+        JSONArray jsonLogs = new JSONArray(post(serverURL + "/logs",postData));
+        PassableLog[] logs = new PassableLog[jsonLogs.length()];
+        for(int i = 0; i < jsonLogs.length(); ++i){
+            JSONObject curObject = (JSONObject) jsonLogs.get(i);
+            logs[i] = new PassableLog(curObject.toString());
+        }
+        return logs;
+    }
+
+    public PassableNotification[] getNotifications(PassableUser user) throws Exception{
+        Map<String,Object> postData = createPostData(user.toJSON());
+        JSONArray jsonNotifs = new JSONArray(post(serverURL + "/notifications", postData));
+        PassableNotification[] notifs = new PassableNotification[jsonNotifs.length()];
+        for(int i = 0; i < jsonNotifs.length(); ++i){
+            JSONObject curObject = (JSONObject) jsonNotifs.get(i);
+            notifs[i] = new PassableNotification(curObject.toString());
+        }
+        return notifs;
+    }
 }
