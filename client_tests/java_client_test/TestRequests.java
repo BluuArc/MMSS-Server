@@ -76,16 +76,72 @@ public class TestRequests{
         }
     }
 
+    public void testGetModule(){
+        try{
+            PassableModule module = testClient.getModule("67890fghij");
+            System.out.println(module.toJSON());
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public void testGetModules(){
+        try{
+            PassableModule[] modules = testClient.getModules();
+            for(int i = 0; i < modules.length; ++i){
+                System.out.println((i+1) + ": " + modules[i].toJSON());
+            }
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }    
+
+    public void testAddModule(){
+        try{
+            PassableModule module = new PassableModule();
+            module.name = "TEST_REQUEST_MODULE";
+            module.id = "TEST_REQUEST_MODULE_ID";
+            module.type = "sensormodule";
+            PassableResponse response = testClient.addModule(module);
+            System.out.println(response.toJSON());
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public void testEditModule(){
+        try{
+            PassableModule module = testClient.getModule("TEST_REQUEST_MODULE_ID");
+            module.editorInfo = new PassableShortInfo("12345abcde", "user");
+            module.isBeingListened = true;
+            PassableResponse response = testClient.editModule(module);
+            System.out.println(response.toJSON());
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public void testDeleteModule(){
+        try{
+            PassableModule module = testClient.getModule("TEST_REQUEST_MODULE_ID");
+            module.editorInfo = new PassableShortInfo("12345abcde", "user");
+            PassableResponse response = testClient.deleteModule(module);
+            System.out.println(response.toJSON());
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
     public static void main(String[] args){
         String serverURL = "http://127.0.0.1:8081";
         try{
             TestRequests tests = new TestRequests(serverURL);
 
-            //get a user
-            tests.testGetUser();
-
             //list users
             tests.testListUsers();
+
+            //get a user
+            tests.testGetUser();
 
             //add a user
             tests.testAddUser();
@@ -95,6 +151,21 @@ public class TestRequests{
 
             //delete a user
             tests.testDeleteUser();
+
+            //get a module
+            tests.testGetModule();
+
+            //list modules
+            tests.testGetModules();
+
+            //add a module
+            tests.testAddModule();
+
+            //edit a module
+            tests.testEditModule();
+
+            //delete a module
+            tests.testDeleteModule();
             
         }catch(Exception e){
             System.out.println(e);

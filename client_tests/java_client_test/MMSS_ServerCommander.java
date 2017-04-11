@@ -31,29 +31,67 @@ public class MMSS_ServerCommander extends ServerRequest{
         return users;
     }
 
-    public PassableResponse addUser(PassableUser newUser)throws Exception{
+    private Map<String,Object> createPostData(String jsonObj) throws Exception{
         Map<String,Object> postData = new LinkedHashMap<>();
-        postData.put("data",newUser.toJSON());
+        postData.put("data",jsonObj);
+        return postData;
+    }
 
-        String response = post(serverURL + "/user/add",postData);
+    private PassableResponse getPostResponse(String path, Map<String,Object> postData) throws Exception{
+        String response = post(serverURL + path,postData);
         PassableResponse parsedResponse = new PassableResponse(response);
         return parsedResponse;
+    }
+
+    private PassableResponse getDeleteResponse(String path, Map<String,Object> postData)throws Exception{
+        String response = delete(serverURL + path,postData);
+        PassableResponse parsedResponse = new PassableResponse(response);
+        return parsedResponse;
+    }
+
+    public PassableResponse addUser(PassableUser newUser)throws Exception{
+        Map<String,Object> postData = createPostData(newUser.toJSON());
+
+        return getPostResponse("/user/add", postData);
     }
 
     public PassableResponse editUser(PassableUser editedUser) throws Exception{
-        Map<String,Object> postData = new LinkedHashMap<>();
-        postData.put("data", editedUser.toJSON());
-
-        String response = post(serverURL + "/user/edit", postData);
-        PassableResponse parsedResponse = new PassableResponse(response);
-        return parsedResponse;
+        Map<String,Object> postData = createPostData(editedUser.toJSON());
+        return getPostResponse("/user/edit", postData);
     }
 
     public PassableResponse deleteUser(PassableUser userToDelete) throws Exception{
-        Map<String,Object> postData = new LinkedHashMap<>();
-        postData.put("data", userToDelete.toJSON());
-        String response = delete(serverURL + "/user/remove", postData);
-        PassableResponse parsedResponse = new PassableResponse(response);
-        return parsedResponse;
+        Map<String,Object> postData = createPostData(userToDelete.toJSON());
+        return getDeleteResponse("/user/remove", postData);
+    }
+
+    public PassableModule getModule(String id) throws Exception{
+        PassableModule module = new PassableModule(get(serverURL + "/module/id/" + id));
+        return module;
+    }
+
+    public PassableModule[] getModules() throws Exception{
+        JSONArray jsonModules = new JSONArray(get(serverURL + "/module/list"));
+        PassableModule[] modules = new PassableModule[jsonModules.length()];
+        for(int i = 0; i < jsonModules.length(); ++i){
+            JSONObject curObject = (JSONObject) jsonModules.get(i);
+            modules[i] = new PassableModule(curObject.toString());
+        }
+        return modules;
+    }
+
+    public PassableResponse addModule(PassableModule newModule)throws Exception{
+        Map<String,Object> postData = createPostData(newModule.toJSON());
+        return getPostResponse("/module/add", postData);
+    }
+
+    public PassableResponse editModule(PassableModule editedModule) throws Exception{
+        Map<String,Object> postData = createPostData(editedModule.toJSON());
+        return getPostResponse("/module/edit", postData);
+    }
+
+    public PassableResponse deleteModule(PassableModule moduleToDelete) throws Exception{
+        Map<String,Object> postData = createPostData(moduleToDelete.toJSON());
+        return getDeleteResponse("/module/remove", postData);
     }
 }
