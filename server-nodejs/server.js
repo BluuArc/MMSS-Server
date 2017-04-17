@@ -392,10 +392,14 @@ function findIn(array, fieldName, fieldData){
     return null;
 }
 
-function addUser(user_obj) {
-    var search = findIn(users,'id', user_obj["id"]);
+function addUser(user_obj_input) {
+    var search = findIn(users,'id', user_obj_input["id"]);
     if(search == null){
+        var user_obj = JSON.parse(JSON.stringify(user_obj_input));//local copy
         var isBeingListened = false;
+        if(user_obj["editor_info"] != undefined){
+            delete user_obj["editor_info"];
+        }
         user_obj["isBeingListened"] = false; //add to blacklist
         users.push(user_obj);
         if (users.length == 1) {//if new user is the first user, automatically elevate their permissions
@@ -647,9 +651,13 @@ function isModule(json_obj){
 }
 
 //todo: delete editor_info field?
-function addModule(module_obj){
-    var search = findIn(modules, 'id', module_obj["id"]);
+function addModule(module_obj_input){
+    var search = findIn(modules, 'id', module_obj_input["id"]);
     if (search == null) {
+        var module_obj = JSON.parse(JSON.stringify(module_obj_input)); //local copy
+        if (module_obj["editor_info"] != undefined) {
+            delete module_obj["editor_info"];
+        }
         module_obj["isBeingListened"] = false;
         modules.push(module_obj);
         var msg = "Added " + module_obj["name"] + " to the blacklist.";
