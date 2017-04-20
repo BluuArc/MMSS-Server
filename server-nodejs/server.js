@@ -370,7 +370,7 @@ function isValidUser(json_obj) {
     var isValid = (json_obj["logs"] != undefined && json_obj["notifications"] != undefined);
     if(json_obj["type"] != undefined){
         var validTypes = ["guardian", "dependent"]
-        isValid  = isValid && (validTypes.indexOf(json_obj.type.toLowerCase() > -1));
+        isValid  = isValid && (validTypes.indexOf(json_obj.type.toLowerCase()) > -1);
     }
     if(json_obj["name"] != undefined){
         isValid = isValid &&json_obj.name.length > 0;
@@ -493,12 +493,16 @@ app.delete('/user/remove', urlencodedParser, function(request,response){
         message: ""
     };
     if(hasPermission(data["editor_info"])){
-        result.success = removeUser(data["id"], data["editor_info"]);
+        if (users[0].id != data.id){
+            result.success = removeUser(data["id"], data["editor_info"]);
 
-        if (result.success) {
-            result.message = "Removed User ID " + data["id"] + " from the server.";
-        } else {
-            result.message = "User ID " + data["id"] + " not found on the server.";
+            if (result.success) {
+                result.message = "Removed User ID " + data["id"] + " from the server.";
+            } else {
+                result.message = "User ID " + data["id"] + " not found on the server.";
+            }
+        }else{
+            result.message = "Can't remove the first user";
         }
     }else{
         result.message = "Editor info is invalid or doesn't have correct permissions.";
@@ -536,7 +540,13 @@ function editUser(id, newData) {
             } else if (f == "type") {
                 changeLog.push("Changed the type of " + user["id"] + " to be " + user[f] + ". ");
             } else if (f == "isBeingListened") {
-                changeLog.push("User " + user["id"] + " is now on the " + ((user[f] == true) ? "whitelist. " : "blacklist. "));
+                if(users[0].id != user.id){
+                    // console.log("users[0]:"); console.log(users[0]);
+                    changeLog.push("User " + user["id"] + " is now on the " + ((user[f] == true) ? "whitelist. " : "blacklist. "));
+                }else{
+                    user[f] = oldData[f];
+                    changeLog.push("Didn't change blacklist status, as the first user is always whitelisted.");
+                }
             }
         }
     }
