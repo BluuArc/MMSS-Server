@@ -413,7 +413,7 @@ function addUser(user_obj_input) {
         log_new_entry(get_this_server_info(),"user",msg,[user_obj]);
         return true;
     }else{//user already exists
-        var msg = "Attempted to add user " + user_obj["name"] + " to the server, but " + user_obj["id"] + " already exists.";
+        var msg = "Attempted to add user " + user_obj_input["name"] + " to the server, but " + user_obj_input["id"] + " already exists.";
         log_new_entry(get_this_server_info(),"user", msg,[]);
         return false;
     }
@@ -665,8 +665,8 @@ function addModule(module_obj_input){
         log_new_entry(get_this_server_info(), "module", msg, [module_obj]);
         return true;
     }else{
-        var msg = "Attempted to add module " + module_obj["name"] + " to the server, but " + module_obj["id"] + " already exists.";
-        log_new_entry(get_this_server_info(), "module", msg, [module_obj]);
+        var msg = "Attempted to add module " + module_obj_input["name"] + " to the server, but " + module_obj_input["id"] + " already exists.";
+        log_new_entry(get_this_server_info(), "module", msg, [module_obj_input]);
         return false;
     }
 }
