@@ -4,6 +4,7 @@ Server component for MMSS. Full project can be found [here](https://github.com/W
 ## Requirements
 * A fairly recent version of Node.js installed (tested on v7.6.0)
 * A properly configured network set up (if the server is to be accessed from an outside network)
+* Java 8 (for Java test client)
 
 ## What's in here?
 | Path | Description |
@@ -35,6 +36,6 @@ Server component for MMSS. Full project can be found [here](https://github.com/W
     * This is due to the sample code in some of the Passable classes passing things into ArrayLists without type checking, but this is intended behavior since the server mostly handles the passing of data between modules and clients.
 5. Run the TestRequests class with `java TestRequests`. If everything is set up correctly, the class will send a series of test requests to the server and print out the output. You should see a bunch of JSON strings in the output followed by `SUCCESS`. If any tests fail, refer to the output for more information.
 
-## Dependencies
+## External Dependencies
 * See the `package.json` in `server-nodejs` for server dependencies and in `client_tests` for dependencies of the Node test client.
 * The Java test client uses the `org.json` package to process JSON objects.
